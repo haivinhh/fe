@@ -1,39 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UserOutlined,
   VideoCameraOutlined,
-} from '@ant-design/icons';
-import { Layout, Menu } from 'antd';
-
-import { Table, Button, Modal } from 'antd';
-import del from "../Icon/delete.png";
-import edit from "../Icon/edit.png";
+} from "@ant-design/icons";
+import { Layout, Menu, Table, Button, Modal, Input, Form, Select } from "antd";
 import { Link } from "react-router-dom";
 import http from "../HTTP/http";
+import del from "../Icon/delete.png";
+import edit from "../Icon/edit.png";
+
 const { Header, Sider, Content } = Layout;
-const data = [];
-for (let i = 0; i < 20; i++) {
-  data.push({
-    key: i,
-    name: `Edward King ${i}`,
-    age: 32,
-    address: `London, Park Lane no. ${i}`,
-    update: (
-      <>
-        <Button type="primary">Sửa</Button>
-      </>
-    ),
-    delete: (
-      <>
-        <Button danger type="primary">
-          Xóa
-        </Button>
-      </>
-    ),
-  });
-}
+const { Option } = Select;
+
 const Admin = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [title, setTitle] = useState("Sửa");
@@ -44,34 +24,62 @@ const Admin = () => {
   const [nameUpdate, setNameUpdate] = useState("");
   const [priceUpdate, setPriceUpdate] = useState("");
   const [contentUpdate, setContentUpdate] = useState("");
-  const [imageUpdate, setImageIdUpdate] = useState("");
-//   const isAdmin = JSON.parse(localStorage.getItem("users")).role_id === "1";
-  console.log(JSON.parse(localStorage.getItem("user")));
+  const [quantityUpdate, setQuantityUpdate] = useState("");
+  const [imageUpdate, setImageUpdate] = useState("");
+  const [danhMucSPUpdate, setDanhMucSPUpdate] = useState("");
+  const [dongDTUpdate, setDongDTUpdate] = useState("");
+  const [danhMucSPList, setDanhMucSPList] = useState([]);
+  const [dongDTList, setDongDTList] = useState([]);
+
   function showModal(action) {
+    setAction(action);
     if (action === "add") {
       setTitle("Thêm");
-      setAction(action);
       refreshForm();
-      setIsModalOpen(true);
     } else if (action === "update") {
       setTitle("Sửa");
-      setAction(action);
-      setIsModalOpen(true);
     }
+    setIsModalOpen(true);
   }
+
   function refreshForm() {
     setIdUpdate("");
     setNameUpdate("");
     setPriceUpdate("");
     setContentUpdate("");
-    setImageIdUpdate("");
+    setQuantityUpdate("");
+    setImageUpdate("");
+    setDanhMucSPUpdate("");
+    setDongDTUpdate("");
   }
+
   function loadListProduct() {
     http
-      .get("/sanpham")
+      .get("/api/sanpham")
       .then((res) => {
-        console.log(res.data);
         setListProduct(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function loadDanhMucSPList() {
+    http
+      .get("/api/danhmucsp")
+      .then((res) => {
+        setDanhMucSPList(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function loadDongDTList() {
+    http
+      .get("/api/dongdt")
+      .then((res) => {
+        setDongDTList(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -81,170 +89,170 @@ const Admin = () => {
   useEffect(() => {
     document.title = "Trang Admin";
     loadListProduct();
+    loadDanhMucSPList();
+    loadDongDTList();
   }, []);
 
-//   function deleteProd(id) {
-//     console.log(id);
-//     http
-//       .delete(`/product.php?id=${id}`)
-//       .then((res) => {
-//         console.log(res);
-//         if (res.data.message === "true") {
-//           alert("Xóa thành công");
-//           loadListProduct();
-//         } else {
-//           alert("Xóa thất bại");
-//           loadListProduct();
-//         }
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//       });
-//   }
-//   function updateProd(id) {
-//     http
-//       .get(
-//         `/product.php?action=findOne&productId=${id}`
-//       )
-//       .then((res) => {
-//         const data = res.data[0];
+  function deleteProd(id) {
+    http
+      .delete(`/api/sanpham/${id}`)
+      .then((res) => {
+        if (res.data.success) {
+          alert("Xóa thành công");
+          loadListProduct();
+        } else {
+          alert(
+            "Xóa thất bại: " + (res.data.message || "Không xác định được lỗi")
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Xóa thất bại: " + err.message);
+      });
+  }
 
-//         setIdUpdate(data?.id);
-//         setNameUpdate(data?.name);
-//         setPriceUpdate(data?.price);
-//         setContentUpdate(data?.content);
-//         setImageIdUpdate(data?.image);
-//         showModal("update");
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//       });
-//   }
+  function updateProd(idSanPham) {
+    http
+      .get(`/api/sanpham/${idSanPham}`)
+      .then((res) => {
+        const data = res.data[0];
+        setIdUpdate(data?.idSanPham);
+        setNameUpdate(data?.tenSanPham);
+        setPriceUpdate(data?.donGia);
+        setContentUpdate(data?.thongTinSP);
+        setQuantityUpdate(data?.soLuong);
+        setImageUpdate(data?.hinhSP);
+        setDanhMucSPUpdate(data?.danhMucSP);
+        setDongDTUpdate(data?.dongDT);
+        showModal("update");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
-//   function handleOk() {
-//     if (action === "update") {
-//       http
-//         .put(
-//           `/product.php?
-//         id=${idUpdate}&
-//         name=${nameUpdate}&
-//         price=${priceUpdate}&
-//         image=${imageUpdate}&
-//         content=${contentUpdate}`
-//         )
-//         .then((res) => {
-//           if (res.data.message === "true") {
-//             alert("thành công");
-//             setIsModalOpen(false);
-//             loadListProduct();
-//           }
-//         })
-//         .catch((err) => {
-//           console.log(err);
-//         });
-//     } else if (action === "add") {
+  function handleOk() {
+    if (action === "update") {
+      http
+        .put(`/api/sanpham/${idUpdate}`, {
+          tenSanPham: nameUpdate,
+          donGia: priceUpdate,
+          thongTinSP: contentUpdate,
+          soLuong: quantityUpdate,
+          hinhSP: imageUpdate,
+          danhMucSP: danhMucSPUpdate, // Thêm ID của danh mục sản phẩm vào dữ liệu sản phẩm
+          dongDT: dongDTUpdate,
+        })
+        .then((res) => {
+          if (res.data.success) {
+            alert("Cập nhật thành công");
+            setIsModalOpen(false);
+            loadListProduct();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else if (action === "add") {
+      http
+        .post("/api/sanpham", {
+          tenSanPham: nameUpdate,
+          donGia: priceUpdate,
+          thongTinSP: contentUpdate,
+          soLuong: quantityUpdate,
+          hinhSP: imageUpdate,
+          danhMucSP: danhMucSPUpdate, // Thêm ID của danh mục sản phẩm vào dữ liệu sản phẩm mới
+          dongDT: dongDTUpdate,
+        })
+        .then((response) => {
+          if (response.data.idSanPham) {
+            alert("Thêm sản phẩm thành công");
+            setIsModalOpen(false);
+            loadListProduct();
+          } else {
+            alert("Thêm sản phẩm thất bại");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("Thêm sản phẩm thất bại");
+        });
+    }
+  }
+  
 
-//       var formData = new FormData();
-//       formData.append("name",nameUpdate);
-//       formData.append("price",priceUpdate);
-//       formData.append("content",contentUpdate);
-//       formData.append("image",imageUpdate);
-//       http({
-//         method: "post",
-//         url: "/product.php",
-//         data: formData,
-//         headers: { "Content-Type": "multipart/form-data" },
-//       })
-//         .then(function (response) {
-//           //handle success
-//           console.log(response);
-//           if(response.data.message === "success"){
-//             alert("thêm thành công")
-//             loadListProduct()
-//           }else{
-//             alert("thêm thất bại")
-//           }
-//           setIsModalOpen(false)
-//         })
-//         .catch(function (response) {
-//           //handle error
-//           console.log(response);
-//         });
+  function handleCancel() {
+    setIsModalOpen(false);
+  }
 
-//     }
-//   }
-//   function handleCancel() {
-//     setIsModalOpen(false);
-//   }
   const columns = [
     {
       title: "Id",
       dataIndex: "idSanPham",
     },
     {
-      title: "Name",
+      title: "Tên Sản Phảm",
       dataIndex: "tenSanPham",
     },
     {
-      title: "Price",
+      title: "Đơn Giá",
       dataIndex: "donGia",
     },
     {
-      title: "Content",
+      title: "Thông Tin Sản Phẩm",
       dataIndex: "thongTinSP",
+    },
+    {
+      title: "Số Lượng",
+      dataIndex: "soLuong",
     },
     {
       title: "Hình ảnh",
       dataIndex: "hinhSP",
       render: (text) => (
         <img
-          style={{ width: "80px", height: "80px",borderRadius: "10% 10% 10% 10% / 11% 10% 10% 10% " }}
+          style={{ width: "80px", height: "80px", borderRadius: "10%" }}
           src={text}
-          alt="ko co hinh"
+          alt="không có hình"
         />
       ),
     },
     {
+      title: "Danh Mục Sản Phẩm",
+      dataIndex: "danhMucSP",
+    },
+    {
       title: "Sửa",
-      dataIndex: "id",
-      render: (id) => (
+      dataIndex: "idSanPham",
+      render: (idSanPham) => (
         <Link
-        //   onClick={() => {
-        //     updateProd(id);
-        //   }}
-          Default
-          type="primary"
+          onClick={() => {
+            updateProd(idSanPham);
+          }}
         >
-          <img src={edit} width="20px"/>
+          <img src={edit} width="20px" alt="edit" />
         </Link>
       ),
     },
     {
-      title: "Delete",
-      dataIndex: "id",
+      title: "Xóa",
+      dataIndex: "idSanPham",
       render: (id) => (
         <Link
-        //   onClick={() => {
-        //     deleteProd(id);
-        //   }}
-          Default
-          
+          onClick={() => {
+            deleteProd(id);
+          }}
         >
-          <img src={del} width="20px"/>
+          <img src={del} width="20px" alt="delete" />
         </Link>
       ),
     },
   ];
-  
-//   if (!isAdmin )
-//   {
-//     window.location.href="/"
-//   }
-  return (
 
+  return (
     <>
-    
-    <Layout >
+      <Layout>
         <Sider trigger={null} collapsible collapsed={collapsed}>
           <div className="logo" />
           <Menu
@@ -266,12 +274,7 @@ const Admin = () => {
           />
         </Sider>
         <Layout className="site-layout">
-          <Header
-            className="site-layout-background"
-            style={{
-              padding: 0,
-            }}
-          >
+          <Header className="site-layout-background" style={{ padding: 0 }}>
             {React.createElement(
               collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
               {
@@ -282,78 +285,90 @@ const Admin = () => {
           </Header>
           <Content
             className="site-layout-background"
-            style={{
-              margin: "24px 16px",
-              padding: 24,
-              minHeight: 280,
-            }}
+            style={{ margin: "24px 16px", padding: 24, minHeight: 280 }}
           >
             <Button
-              style={{ marginBottom: "20px",background:"#33cc33"}}
+              style={{ marginBottom: "20px", background: "#33cc33" }}
               onClick={() => {
                 showModal("add");
               }}
-              
-              type="success"
+              type="primary"
             >
               <b>Thêm</b>
-              
             </Button>
-            <Table 
-              pagination={{
-                pageSize: 6,
-              }}
+            <Table
+              pagination={{ pageSize: 6 }}
               columns={columns}
               dataSource={listProduct}
             />
             <Modal
               title={title}
               open={isModalOpen}
-            //   onOk={handleOk}
-            //   onCancel={handleCancel}
+              onOk={handleOk}
+              onCancel={handleCancel}
             >
-              Name :
-              <input
-                onChange={(e) => {
-                  setNameUpdate(e.target.value);
-                }}
-                type={"text"}
-                value={nameUpdate}
-              />
-              <br />
-              Price :
-              <input
-                onChange={(e) => {
-                  setPriceUpdate(e.target.value);
-                }}
-                type={"text"}
-                value={priceUpdate}
-              />
-              <br />
-              Content :
-              <input
-                onChange={(e) => {
-                  setContentUpdate(e.target.value);
-                }}
-                type={"text"}
-                value={contentUpdate}
-              />
-              <br />
-              ImageUrl :
-              <input
-                onChange={(e) => {
-                  setImageIdUpdate(e.target.value);
-                }}
-                type={"text"}
-                value={imageUpdate}
-              />
-              <br />
+              <Form layout="vertical">
+                <Form.Item label="Tên Sản Phẩm">
+                  <Input
+                    value={nameUpdate}
+                    onChange={(e) => setNameUpdate(e.target.value)}
+                  />
+                </Form.Item>
+                <Form.Item label="Đơn Giá">
+                  <Input
+                    value={priceUpdate}
+                    onChange={(e) => setPriceUpdate(e.target.value)}
+                  />
+                </Form.Item>
+                <Form.Item label="Thông Tin Sản Phẩm">
+                  <Input
+                    value={contentUpdate}
+                    onChange={(e) => setContentUpdate(e.target.value)}
+                  />
+                </Form.Item>
+                <Form.Item label="Số Lượng">
+                  <Input
+                    value={quantityUpdate}
+                    onChange={(e) => setQuantityUpdate(e.target.value)}
+                  />
+                </Form.Item>
+                <Form.Item label="Hình Ảnh URL">
+                  <Input
+                    value={imageUpdate}
+                    onChange={(e) => setImageUpdate(e.target.value)}
+                  />
+                </Form.Item>
+                <Form.Item label="Danh Mục Sản Phẩm">
+                  <Select
+                    value={danhMucSPUpdate}
+                    onChange={(value) => setDanhMucSPUpdate(value)}
+                  >
+                    {danhMucSPList.map((item) => (
+                      <Option key={item.id} value={item.id}>
+                        {item.tenDanhMuc}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item label="Dòng Điện Thoại">
+                  <Select
+                    value={dongDTUpdate}
+                    onChange={(value) => setDongDTUpdate(value)}
+                  >
+                    {dongDTList.map((item) => (
+                      <Option key={item.id} value={item.id}>
+                        {item.tenDongDT}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Form>
             </Modal>
           </Content>
         </Layout>
       </Layout>
-
     </>
   );
 };
+
 export default Admin;

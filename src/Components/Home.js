@@ -23,7 +23,7 @@ class Home extends Component {
   }
 
   loadProducts() {
-    http.get(`/sanpham`).then((response) => {
+    http.get(`/api/sanpham`).then((response) => {
       console.log(response);
       this.setState({ products: response.data });
     }).catch(error => {
