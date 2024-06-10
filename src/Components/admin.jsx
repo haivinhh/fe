@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import http from "../HTTP/http";
 import del from "../Icon/delete.png";
 import edit from "../Icon/edit.png";
+import '../CSS/admin.css'; // Import file CSS tùy chỉnh
 
 const { Header, Sider, Content } = Layout;
 const { Option } = Select;
@@ -141,7 +142,7 @@ const Admin = () => {
           thongTinSP: contentUpdate,
           soLuong: quantityUpdate,
           hinhSP: imageUpdate,
-          danhMucSP: danhMucSPUpdate, // Thêm ID của danh mục sản phẩm vào dữ liệu sản phẩm
+          danhMucSP: danhMucSPUpdate,
           dongDT: dongDTUpdate,
         })
         .then((res) => {
@@ -162,7 +163,7 @@ const Admin = () => {
           thongTinSP: contentUpdate,
           soLuong: quantityUpdate,
           hinhSP: imageUpdate,
-          danhMucSP: danhMucSPUpdate, // Thêm ID của danh mục sản phẩm vào dữ liệu sản phẩm mới
+          danhMucSP: danhMucSPUpdate,
           dongDT: dongDTUpdate,
         })
         .then((response) => {
@@ -180,7 +181,6 @@ const Admin = () => {
         });
     }
   }
-  
 
   function handleCancel() {
     setIsModalOpen(false);
@@ -221,6 +221,10 @@ const Admin = () => {
     {
       title: "Danh Mục Sản Phẩm",
       dataIndex: "danhMucSP",
+    },
+    {
+      title: "Dòng Điện Thoại",
+      dataIndex: "dongDT",
     },
     {
       title: "Sửa",
@@ -297,9 +301,11 @@ const Admin = () => {
               <b>Thêm</b>
             </Button>
             <Table
-              pagination={{ pageSize: 6 }}
               columns={columns}
-              dataSource={listProduct}
+              dataSource={listProduct.map((item) => ({
+                ...item,
+                key: item.idSanPham,
+              }))}
             />
             <Modal
               title={title}
