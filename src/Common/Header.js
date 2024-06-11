@@ -5,12 +5,45 @@ import Form from "react-bootstrap/Form";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import { Link } from 'react-router-dom';
 import logo from "../Icon/logo.jpg";
+import http from "../HTTP/http";
+
 class Header extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      categories: []
+    };
+    this.loadCategories = this.loadCategories.bind(this);
+  }
+  loadCategories() {
+    http.get("/api/danhmucsp")
+      .then(response => {
+        this.setState({ categories: response.data });
+      })
+      .catch(error => {
+        console.error("Error loading categories:", error);
+      });
+  }
+  componentDidMount() {
+    this.loadCategories();
   }
   render() {
+    const cates = this.state.categories.map((value) => (
+      <>
+      <NavDropdown.Item key={value.id}>
+        <Link
+          onClick={()=>{window.location.href="/sanpham/danhmuc/" + value.id}}
+          to={'/sanpham/danhmuc/' + value.id}
+          className="text-black"
+          style={{ textDecoration: "none" }}
+        >
+          {value.tenDanhMuc}
+        </Link>
+      </NavDropdown.Item>
+      </>
+    ));
     return (
       <>
         <Navbar expand="lg" className="bg-body-tertiary">
@@ -30,17 +63,13 @@ class Header extends React.Component {
                 style={{ maxHeight: "100px" }}
                 navbarScroll
               >
-                <Nav.Link href="#action1">Trang chủ</Nav.Link>
-                <Nav.Link href="#action2">Sản Phẩm</Nav.Link>
-                <NavDropdown title="Link" id="navbarScrollingDropdown">
-                  <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
-                  <NavDropdown.Item href="#action4">
-                    Another action
-                  </NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item href="#action5">
-                    Something else here
-                  </NavDropdown.Item>
+                <Nav.Link href="/">Trang chủ</Nav.Link>
+
+                <NavDropdown
+                  title="Danh mục sản phẩm"
+                  id="navbarScrollingDropdown"
+                >
+                  {cates}
                 </NavDropdown>
                 <Nav.Link href="#" disabled>
                   Link
@@ -62,4 +91,5 @@ class Header extends React.Component {
     );
   }
 }
+
 export default Header;

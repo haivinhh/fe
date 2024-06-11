@@ -13,7 +13,6 @@ import edit from "../Icon/edit.png";
 import '../CSS/admin.css'; // Import file CSS tùy chỉnh
 
 const { Header, Sider, Content } = Layout;
-const { Option } = Select;
 
 const Admin = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -350,9 +349,9 @@ const Admin = () => {
                     onChange={(value) => setDanhMucSPUpdate(value)}
                   >
                     {danhMucSPList.map((item) => (
-                      <Option key={item.id} value={item.id}>
+                      <Select.Option key={item.id} value={item.id}>
                         {item.tenDanhMuc}
-                      </Option>
+                      </Select.Option>
                     ))}
                   </Select>
                 </Form.Item>
@@ -362,9 +361,9 @@ const Admin = () => {
                     onChange={(value) => setDongDTUpdate(value)}
                   >
                     {dongDTList.map((item) => (
-                      <Option key={item.id} value={item.id}>
+                      <Select.Option key={item.id} value={item.id}>
                         {item.tenDongDT}
-                      </Option>
+                      </Select.Option>
                     ))}
                   </Select>
                 </Form.Item>

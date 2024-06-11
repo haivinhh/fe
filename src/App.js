@@ -1,15 +1,18 @@
 import './App.css';
 import Home from './Components/Home';
-import Admin from './Components/admin'; // Corrected the import
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Import BrowserRouter
+import Admin from './Components/admin';
+import Products from "./Components/Products";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function App() {
+
   return (
     <div className="App">
-      <Router> {/* Wrap Routes with BrowserRouter */}
+      <Router>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/sanpham/danhmuc/:idDanhMuc" element={<Products />} />
         </Routes>
       </Router>
     </div>
