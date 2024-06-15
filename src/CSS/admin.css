@@ -1,3 +1,17 @@
+/* admin.css */
 .trigger {
-    color: white;
-  }
+  color: white;
+  cursor: pointer;
+  transition: color 0.3s;
+  position: absolute;
+  left: 250px;
+  top : 30px
+}
+.custom-menu {
+  text-align: left; /* Canh lề trái cho menu */
+}
+
+.logo {
+  margin: 16px; /* Ví dụ, tạo khoảng cách cho logo */
+}
+

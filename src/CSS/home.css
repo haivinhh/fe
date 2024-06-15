@@ -36,3 +36,7 @@ src/CSS/home.css
     margin-top: auto;
     text-align: center; /* Optional: Center align text if desired */
 }
+.no-underline {
+    text-decoration: none;
+  }
+  

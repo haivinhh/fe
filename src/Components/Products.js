@@ -1,115 +1,144 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "../Common/Footer";
 import Header from "../Common/Header";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-import Container from "react-bootstrap/esm/Container";
+import Container from "react-bootstrap/Container";
 import Pagination from "react-bootstrap/Pagination";
 import http from "../HTTP/http";
+import { useLocation } from 'react-router-dom';
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 
-class Products extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      products: [],
-      value: 9,
-      page: 1,
-      totalPages: 1,
-    };
-    this.loadProducts = this.loadProducts.bind(this);
-    this.loadProductsFromCate = this.loadProductsFromCate.bind(this);
-    this.componentDidMount = this.componentDidMount.bind(this);
-    this.clickPage = this.clickPage.bind(this);
-  }
+const Products = (props) => {
+  const [products, setProducts] = useState([]);
+  const [value, setValue] = useState(15);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const location = useLocation();
 
-  clickPage(e) {
-    this.setState({ page: parseInt(e.target.text) }, this.loadProducts);
-  }
+  const searchParams = new URLSearchParams(location.search);
+  const searchTerm = searchParams.get('search');
 
-  loadProducts() {
-    
-    http.get(`/api/sanpham`).then((response) => {
-      const totalPages = Math.ceil(response.data.length / this.state.value);
-      this.setState({ products: response.data, totalPages });
-    }).catch(error => {
-      console.error("There was an error fetching the products!", error);
-    });
-  }
-
-  loadProductsFromCate() {
-      http.get(`/api/sanpham/danhmuc` + window.location.href.split("/")[1])
-      .then((response) => {
-        console.log(Math.ceil(response.data.length / this.state.value));
-        this.setState({ products: response.data });
-        this.setState({
-          totalPages: Math.ceil(response.data.length / this.state.value),
-        });
-      });
-    }
-
-  componentDidMount() {
+  useEffect(() => {
     document.title = "MCase";
-    if (this.props.idDanhMuc) {
-      this.loadProductsFromCate();
+    if (searchTerm) {
+      searchProducts(searchTerm);
+    } else if (props.idDanhMuc) {
+      loadProductsFromCate();
     } else {
-      this.loadProducts();
+      loadProducts();
     }
-  }
+  }, [searchTerm, page, props.idDanhMuc]);
 
-  render() {
-    const { products, value, page, totalPages } = this.state;
-    const startIndex = (page - 1) * value;
-    const currentProducts = products.slice(startIndex, startIndex + value);
+  const clickPage = (e) => {
+    setPage(parseInt(e.target.text));
+  };
 
-    const listProducts = currentProducts.map((product) => (
+  const loadProducts = () => {
+    http.get(`/api/sanpham`)
+      .then((response) => {
+        const totalPages = Math.ceil(response.data.length / value);
+        setProducts(response.data);
+        setTotalPages(totalPages);
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the products!", error);
+      });
+  };
+
+  const loadProductsFromCate = () => {
+    const idDanhMuc = window.location.href.split("/")[4];
+    http.get(`/api/sanpham/danhmuc/${idDanhMuc}`)
+      .then((response) => {
+        setProducts(response.data);
+        setTotalPages(Math.ceil(response.data.length / value));
+      });
+  };
+
+  const searchProducts = (term) => {
+    http.get(`/api/sanpham/search/${encodeURIComponent(term)}`)
+      .then((response) => {
+        setProducts(response.data);
+        setTotalPages(Math.ceil(response.data.length / value));
+      })
+      .catch((error) => {
+        console.error("There was an error searching the products!", error);
+      });
+  };
+
+  const startIndex = (page - 1) * value;
+  const currentProducts = products.slice(startIndex, startIndex + value);
+
+  const formatPrice = (price) => {
+    return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+  };
+
+  const listProducts = currentProducts.length > 0 ? (
+    currentProducts.map((product) => (
       <Col sm={4} key={product.idSanPham} className="d-flex">
-        <Card style={{ width: "18rem", marginTop: "50px" }} className="flex-fill">
-          <Card.Img
-            variant="top"
-            src={product.hinhSP}
-            className="product-image mb-3"
-          />
-          <Card.Body className="d-flex flex-column">
-            <Card.Title>{product.tenSanPham}</Card.Title>
-            <Card.Text style={{ color: "red" }}>
-              {product.donGia}đ
-            </Card.Text>
-          </Card.Body>
-        </Card>
+        <Card
+                style={{ width: "18rem", marginTop: "50px" }}
+                className="flex-fill"
+              >
+                <Link
+                  to={`/sanpham/detail/${product.idSanPham}`}
+                  className="text-dark no-underline"
+                >
+                  {" "}
+                  {/* Link to DetailProduct */}
+                  <Card.Img
+                    variant="top"
+                    src={product.hinhSP}
+                    className="product-image mb-3"
+                  />
+                  <Card.Body className="d-flex flex-column">
+                    <Card.Title style={{ textDecoration: "none" }}>
+                      {product.tenSanPham}
+                    </Card.Title>
+                    <Card.Text style={{ color: "red", textDecoration: "none" }}>
+                      {formatPrice(product.donGia)}
+                    </Card.Text>
+                  </Card.Body>
+                </Link>
+              </Card>
       </Col>
-    ));
+    ))
+  ) : (
+    <Col>
+      <p>Không tìm thấy sản phẩm nào với từ khóa "{searchTerm}".</p>
+    </Col>
+  );
 
-    let listPage = [];
-    for (let index = 0; index < totalPages; index++) {
-      const value2 = index + 1;
-      listPage.push(
-        <Pagination.Item
-          key={value2}
-          active={value2 === page}
-          onClick={this.clickPage}
-        >
-          {value2}
-        </Pagination.Item>
-      );
-    }
-
-    return (
-      <>
-        <Header />
-        <Container>
-          <Row style={{ marginTop: "20px" }}>{listProducts}</Row>
-          <Row>
-            <Col className="d-flex justify-content-center py-3">
-              <Pagination>{listPage}</Pagination>
-            </Col>
-          </Row>
-        </Container>
-        <Footer />
-      </>
+  let listPage = [];
+  for (let index = 0; index < totalPages; index++) {
+    const value2 = index + 1;
+    listPage.push(
+      <Pagination.Item
+        key={value2}
+        active={value2 === page}
+        onClick={clickPage}
+      >
+        {value2}
+      </Pagination.Item>
     );
   }
-}
+
+  return (
+    <>
+      <Header />
+      <Container>
+        <Row style={{ marginTop: "20px" }}>{listProducts}</Row>
+        <Row>
+          <Col className="d-flex justify-content-center py-3">
+            <Pagination>{listPage}</Pagination>
+          </Col>
+        </Row>
+      </Container>
+      <Footer />
+    </>
+  );
+};
 
 export default Products;
