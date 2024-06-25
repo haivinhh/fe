@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from "../Icon/logo.jpg";
 import http from "../HTTP/http";
 import '../CSS/header.css';
@@ -14,6 +14,7 @@ const Header = ({ onSearch }) => {
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -27,32 +28,40 @@ const Header = ({ onSearch }) => {
     loadCategories();
   }, []);
 
+  // Xử lý khi người dùng chọn danh mục sản phẩm
   const handleCategoryClick = (idDanhMuc) => {
     localStorage.setItem('selectedCategoryId', idDanhMuc);
   };
 
+  // Xử lý khi người dùng thay đổi ô tìm kiếm
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
+  // Xử lý khi người dùng gửi form tìm kiếm
   const handleSearchSubmit = (event) => {
     event.preventDefault();
     if (searchTerm.trim()) {
+      localStorage.removeItem('selectedCategoryId'); // Xóa selectedCategoryId khi tìm kiếm
       localStorage.setItem('searchTerm', searchTerm);
-      window.location.href = `/sanpham?search=${encodeURIComponent(searchTerm)}`; // Cập nhật URL và reload trang
+      navigate(`/sanpham/search=${encodeURIComponent(searchTerm)}`); // Sử dụng navigate để điều hướng
     }
   };
-
+  const handleSanPhamClick = () => {
+    localStorage.removeItem('selectedCategoryId');
+    localStorage.removeItem('searchTerm');
+  };
+  // Tạo danh sách các danh mục sản phẩm
   const cates = categories.map((value) => (
-    <NavDropdown.Item key={value.idDanhMuc}>
-      <Link
-        onClick={() => handleCategoryClick(value.idDanhMuc)}
-        to={'/sanpham/danhmuc/' + value.idDanhMuc}
-        className="text-black"
-        style={{ textDecoration: "none" }}
-      >
-        {value.tenDanhMuc}
-      </Link>
+    <NavDropdown.Item
+      key={value.idDanhMuc}
+      as={Link}
+      to={'/sanpham/danhmuc/' + value.idDanhMuc}
+      onClick={() => handleCategoryClick(value.idDanhMuc)}
+      className="text-black"
+      style={{ textDecoration: "none" }}
+    >
+      {value.tenDanhMuc}
     </NavDropdown.Item>
   ));
 
@@ -74,7 +83,7 @@ const Header = ({ onSearch }) => {
               <NavDropdown title="Danh mục sản phẩm" id="navbarScrollingDropdown">
                 {cates}
               </NavDropdown>
-              <Nav.Link as={Link} to="/sanpham">
+              <Nav.Link as={Link} to="/sanpham" onClick={handleSanPhamClick}>
                 Sản Phẩm
               </Nav.Link>
             </Nav>

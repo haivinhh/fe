@@ -9,9 +9,9 @@ import Container from "react-bootstrap/Container";
 import Pagination from "react-bootstrap/Pagination";
 import http from "../HTTP/http";
 import { useLocation } from 'react-router-dom';
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import { Link } from "react-router-dom";
 
-const Products = (props) => {
+const Products = () => {
   const [products, setProducts] = useState([]);
   const [value, setValue] = useState(15);
   const [page, setPage] = useState(1);
@@ -23,17 +23,18 @@ const Products = (props) => {
 
   useEffect(() => {
     document.title = "MCase";
-    if (searchTerm) {
-      searchProducts(searchTerm);
-    } else if (props.idDanhMuc) {
+    if (localStorage.getItem("selectedCategoryId")) {
       loadProductsFromCate();
+    } else if (localStorage.getItem("searchTerm")) {
+      searchProducts(localStorage.getItem("searchTerm"));
     } else {
       loadProducts();
     }
-  }, [searchTerm, page, props.idDanhMuc]);
+  }, [localStorage.getItem("searchTerm"), page, localStorage.getItem("selectedCategoryId")]);
 
   const clickPage = (e) => {
     setPage(parseInt(e.target.text));
+    
   };
 
   const loadProducts = () => {
@@ -49,11 +50,14 @@ const Products = (props) => {
   };
 
   const loadProductsFromCate = () => {
-    const idDanhMuc = window.location.href.split("/")[4];
-    http.get(`/api/sanpham/danhmuc/${idDanhMuc}`)
+    const selectedCategoryId = localStorage.getItem("selectedCategoryId");
+    http.get(`/api/sanpham/danhmuc/${selectedCategoryId}`)
       .then((response) => {
         setProducts(response.data);
         setTotalPages(Math.ceil(response.data.length / value));
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the products from the category!", error);
       });
   };
 
@@ -78,31 +82,15 @@ const Products = (props) => {
   const listProducts = currentProducts.length > 0 ? (
     currentProducts.map((product) => (
       <Col sm={4} key={product.idSanPham} className="d-flex">
-        <Card
-                style={{ width: "18rem", marginTop: "50px" }}
-                className="flex-fill"
-              >
-                <Link
-                  to={`/sanpham/detail/${product.idSanPham}`}
-                  className="text-dark no-underline"
-                >
-                  {" "}
-                  {/* Link to DetailProduct */}
-                  <Card.Img
-                    variant="top"
-                    src={product.hinhSP}
-                    className="product-image mb-3"
-                  />
-                  <Card.Body className="d-flex flex-column">
-                    <Card.Title style={{ textDecoration: "none" }}>
-                      {product.tenSanPham}
-                    </Card.Title>
-                    <Card.Text style={{ color: "red", textDecoration: "none" }}>
-                      {formatPrice(product.donGia)}
-                    </Card.Text>
-                  </Card.Body>
-                </Link>
-              </Card>
+        <Card style={{ width: "18rem", marginTop: "50px" }} className="flex-fill">
+          <Link to={`/sanpham/detail/${product.idSanPham}`} className="text-dark no-underline">
+            <Card.Img variant="top" src={product.hinhSP} className="product-image mb-3" />
+            <Card.Body className="d-flex flex-column">
+              <Card.Title style={{ textDecoration: "none" }}>{product.tenSanPham}</Card.Title>
+              <Card.Text style={{ color: "red", textDecoration: "none" }}>{formatPrice(product.donGia)}</Card.Text>
+            </Card.Body>
+          </Link>
+        </Card>
       </Col>
     ))
   ) : (
@@ -115,11 +103,7 @@ const Products = (props) => {
   for (let index = 0; index < totalPages; index++) {
     const value2 = index + 1;
     listPage.push(
-      <Pagination.Item
-        key={value2}
-        active={value2 === page}
-        onClick={clickPage}
-      >
+      <Pagination.Item key={value2} active={value2 === page} onClick={clickPage}>
         {value2}
       </Pagination.Item>
     );

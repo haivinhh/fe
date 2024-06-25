@@ -21,6 +21,7 @@ const Admin = () => {
   const [action, setAction] = useState("");
   const [listProduct, setListProduct] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingKey, setEditingKey] = useState("");
   const [formData, setFormData] = useState({
     idUpdate: "",
     nameUpdate: "",
@@ -99,6 +100,42 @@ const Admin = () => {
     loadDongDTList();
   }, []);
 
+  const isEditing = (record) => record.idSanPham === editingKey;
+
+  const editRow = (record) => {
+    setEditingKey(record.idSanPham);
+  };
+
+  const cancelEdit = () => {
+    setEditingKey("");
+  };
+
+  const saveRow = (record) => {
+    // Gọi API để lưu dữ liệu sản phẩm
+    http
+      .put(`/api/sanpham/${record.idSanPham}`, {
+        tenSanPham: record.tenSanPham,
+        donGia: record.donGia,
+        thongTinSP: record.thongTinSP,
+        soLuong: record.soLuong,
+        hinhSP: record.hinhSP,
+        danhMucSP: record.danhMucSP,
+        dongDT: record.dongDT,
+      })
+      .then((res) => {
+        if (res.data.success) {
+          alert("Cập nhật thành công");
+          loadListProduct();
+          setEditingKey("");
+        } else {
+          alert("Cập nhật thất bại");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Cập nhật thất bại");
+      });
+  };
   const confirmDelete = (id) => {
     Modal.confirm({
       title: "Bạn có chắc chắn muốn xóa sản phẩm này không?",
@@ -214,26 +251,88 @@ const Admin = () => {
     {
       title: "Id",
       dataIndex: "idSanPham",
+      key: "idSanPham",
     },
     {
       title: "Tên Sản Phẩm",
       dataIndex: "tenSanPham",
+      key: "tenSanPham",
+      editable: true, // Cho phép chỉnh sửa trực tiếp
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <Input
+            value={record.tenSanPham}
+            onChange={(e) => handleFieldChange(e.target.value, "tenSanPham", record)}
+            onBlur={() => saveRow(record)}
+            onPressEnter={() => saveRow(record)}
+          />
+        ) : (
+          record.tenSanPham
+        );
+      },
     },
     {
       title: "Đơn Giá",
       dataIndex: "donGia",
+      key: "donGia",
+      editable: true, // Cho phép chỉnh sửa trực tiếp
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <Input
+            value={record.donGia}
+            onChange={(e) => handleFieldChange(e.target.value, "donGia", record)}
+            onBlur={() => saveRow(record)}
+            onPressEnter={() => saveRow(record)}
+          />
+        ) : (
+          record.donGia
+        );
+      },
     },
     {
       title: "Thông Tin Sản Phẩm",
       dataIndex: "thongTinSP",
+      key: "thongTinSP",
+      editable: true, // Cho phép chỉnh sửa trực tiếp
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <Input
+            value={record.thongTinSP}
+            onChange={(e) => handleFieldChange(e.target.value, "thongTinSP", record)}
+            onBlur={() => saveRow(record)}
+            onPressEnter={() => saveRow(record)}
+          />
+        ) : (
+          record.thongTinSP
+        );
+      },
     },
     {
       title: "Số Lượng",
       dataIndex: "soLuong",
+      key: "soLuong",
+      editable: true, // Cho phép chỉnh sửa trực tiếp
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <Input
+            value={record.soLuong}
+            onChange={(e) => handleFieldChange(e.target.value, "soLuong", record)}
+            onBlur={() => saveRow(record)}
+            onPressEnter={() => saveRow(record)}
+          />
+        ) : (
+          record.soLuong
+        );
+      },
     },
     {
       title: "Hình ảnh",
       dataIndex: "hinhSP",
+      key: "hinhSP",
       render: (text) => (
         <img
           style={{ width: "80px", height: "80px", borderRadius: "10%" }}
@@ -245,38 +344,118 @@ const Admin = () => {
     {
       title: "Danh Mục Sản Phẩm",
       dataIndex: "danhMucSP",
+      key: "danhMucSP",
+      editable: true, // Cho phép chỉnh sửa trực tiếp
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <Select
+            value={record.danhMucSP}
+            onChange={(value) => handleFieldChange(value, "danhMucSP", record)}
+            onBlur={() => saveRow(record)}
+            style={{ width: "100%" }}
+          >
+            {danhMucSPList.map((item) => (
+              <Select.Option key={item.idDanhMuc} value={item.idDanhMuc}>
+                {item.tenDanhMuc}
+              </Select.Option>
+            ))}
+          </Select>
+        ) : (
+          record.danhMucSP
+        );
+      },
     },
     {
       title: "Dòng Điện Thoại",
       dataIndex: "dongDT",
+      key: "dongDT",
+      editable: true, // Cho phép chỉnh sửa trực tiếp
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <Select
+            value={record.dongDT}
+            onChange={(value) => handleFieldChange(value, "dongDT", record)}
+            onBlur={() => saveRow(record)}
+            style={{ width: "100%" }}
+          >
+            {dongDTList.map((item) => (
+              <Select.Option key={item.idDongDT} value={item.idDongDT}>
+                {item.tenDongDT}
+              </Select.Option>
+            ))}
+          </Select>
+        ) : (
+          record.dongDT
+        );
+      },
     },
     {
       title: "Sửa",
-      dataIndex: "idSanPham",
-      render: (idSanPham) => (
-        <Link
-          onClick={() => {
-            showModal("update", idSanPham);
-          }}
-        >
-          <img src={edit} width="20px" alt="edit" />
-        </Link>
-      ),
+      dataIndex: "edit",
+      key: "edit",
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <span>
+            <button
+              onClick={() => saveRow(record)}
+              style={{
+                marginRight: 8,
+                background: "green",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+              }}
+            >
+              Lưu
+            </button>
+            <button
+              onClick={cancelEdit}
+              style={{
+                background: "red",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+              }}
+            >
+              Hủy
+            </button>
+          </span>
+        ) : (
+          <img
+            src={edit}
+            style={{ width: "20px", height: "20px", cursor: "pointer" }}
+            onClick={() => editRow(record)}
+          />
+        );
+      },
     },
     {
-      title: "Xóa",
-      dataIndex: "idSanPham",
-      render: (id) => (
-        <Link
-          onClick={() => {
-            confirmDelete(id);
-          }}
-        >
-          <img src={del} width="20px" alt="delete" />
-        </Link>
+      title: "Xoá",
+      dataIndex: "delete",
+      key: "delete",
+      render: (_, record) => (
+        <img
+          src={del}
+          style={{ width: "20px", height: "20px", cursor: "pointer" }}
+          onClick={() => confirmDelete(record.idSanPham)}
+        />
       ),
     },
   ];
+  const handleFieldChange = (value, fieldName, record) => {
+    // Cập nhật dữ liệu của sản phẩm đang chỉnh sửa
+    const updatedRecord = {
+      ...record,
+      [fieldName]: value,
+    };
+    const newListProduct = listProduct.map(item =>
+      item.idSanPham === record.idSanPham ? updatedRecord : item
+    );
+    setListProduct(newListProduct);
+  };
 
   return (
     <>
