@@ -1,3 +1,4 @@
+// src/Common/Header.js
 import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
@@ -28,30 +29,28 @@ const Header = ({ onSearch }) => {
     loadCategories();
   }, []);
 
-  // Xử lý khi người dùng chọn danh mục sản phẩm
   const handleCategoryClick = (idDanhMuc) => {
     localStorage.setItem('selectedCategoryId', idDanhMuc);
   };
 
-  // Xử lý khi người dùng thay đổi ô tìm kiếm
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  // Xử lý khi người dùng gửi form tìm kiếm
   const handleSearchSubmit = (event) => {
     event.preventDefault();
     if (searchTerm.trim()) {
-      localStorage.removeItem('selectedCategoryId'); // Xóa selectedCategoryId khi tìm kiếm
+      localStorage.removeItem('selectedCategoryId'); // Clear selectedCategoryId on search
       localStorage.setItem('searchTerm', searchTerm);
-      navigate(`/sanpham/search=${encodeURIComponent(searchTerm)}`); // Sử dụng navigate để điều hướng
+      navigate(`/sanpham/search=${encodeURIComponent(searchTerm)}`); // Use navigate for routing
     }
   };
+
   const handleSanPhamClick = () => {
     localStorage.removeItem('selectedCategoryId');
     localStorage.removeItem('searchTerm');
   };
-  // Tạo danh sách các danh mục sản phẩm
+
   const cates = categories.map((value) => (
     <NavDropdown.Item
       key={value.idDanhMuc}
@@ -67,7 +66,7 @@ const Header = ({ onSearch }) => {
 
   return (
     <>
-      <Navbar expand="lg" className="bg-body-tertiary">
+      <Navbar expand="lg" >
         <Container fluid>
           <Navbar.Brand href="#">
             <img
@@ -87,18 +86,21 @@ const Header = ({ onSearch }) => {
                 Sản Phẩm
               </Nav.Link>
             </Nav>
-            <Form className="d-flex" onSubmit={handleSearchSubmit}>
+            <Form className="custom-search-container" onSubmit={handleSearchSubmit}>
               <Form.Control
                 type="search"
                 placeholder="Tìm kiếm"
-                className="me-2"
+                className="me-2 custom-search-input"
                 aria-label="Tìm kiếm"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
-              <Button variant="outline-success" type="submit">Tìm kiếm</Button>
             </Form>
+            
           </Navbar.Collapse>
+          <Button variant="dark" type="submit" className="button" >
+                Tìm kiếm
+              </Button>
         </Container>
       </Navbar>
     </>

@@ -9,16 +9,21 @@ import Container from "react-bootstrap/Container";
 import ListGroup from "react-bootstrap/ListGroup";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { Radio } from 'antd'; // Import Radio from antd
 import http from "../HTTP/http";
+import '../CSS/detailproducts.css'; // Import CSS file
 
 const DetailProduct = () => {
   const { idSanPham } = useParams();
   const [product, setProduct] = useState({});
   const [count, setCount] = useState(1);
+  const [phoneModels, setPhoneModels] = useState([]);
+  const [selectedPhoneModel, setSelectedPhoneModel] = useState(null);
 
   useEffect(() => {
     loadProduct();
+    loadPhoneModels();
   }, []);
 
   const loadProduct = () => {
@@ -32,6 +37,17 @@ const DetailProduct = () => {
       });
   };
 
+  const loadPhoneModels = () => {
+    http.get(`/api/sanpham/getdongdtbyidsp/${idSanPham}`)
+      .then((response) => {
+        console.log(response.data);
+        setPhoneModels(response.data);
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the phone models!", error);
+      });
+  };
+
   const formatPrice = (price) => {
     if (price) {
       return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
@@ -39,7 +55,7 @@ const DetailProduct = () => {
       return ''; // or any default value you prefer
     }
   };
-  
+
   const addToCart = () => {
     // Add logic to add the product to cart
     console.log("Add to cart:", product);
@@ -60,6 +76,10 @@ const DetailProduct = () => {
     if (!isNaN(value) && value > 0) {
       setCount(value);
     }
+  };
+
+  const handlePhoneModelChange = (e) => {
+    setSelectedPhoneModel(e.target.value);
   };
 
   return (
@@ -91,6 +111,20 @@ const DetailProduct = () => {
               <Card.Text>
                 <b style={{color:"red"}}>{formatPrice(product.donGia)}</b>{" "}
               </Card.Text>
+              
+                <Radio.Group onChange={handlePhoneModelChange} value={selectedPhoneModel} size="large">
+                  {phoneModels.map((model) => (
+                    <Radio.Button 
+                      key={model.idDongDT} 
+                      value={model.idDongDT} 
+                      className={`custom-radio-button ${selectedPhoneModel === model.idDongDT ? 'selected' : ''}`} 
+                      style={{ margin: "5px" }}
+                    >
+                      {model.tenDongDT}
+                    </Radio.Button>
+                  ))}
+                </Radio.Group>
+              
               <Row
                 xs="auto"
                 style={{
@@ -132,7 +166,6 @@ const DetailProduct = () => {
               </Row>
               <ListGroup.Item>
                 <Col md="auto" style={{ marginRight: "10px" }}>
-                  
                   <Button
                     variant="light"
                     style={{boxShadow: "5px 5px #C0C0C0", height:"51px"}}

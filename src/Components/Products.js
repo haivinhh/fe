@@ -10,6 +10,7 @@ import Pagination from "react-bootstrap/Pagination";
 import http from "../HTTP/http";
 import { useLocation } from 'react-router-dom';
 import { Link } from "react-router-dom";
+import Filter from "../Common/Filter";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -17,6 +18,11 @@ const Products = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const location = useLocation();
+  const [filters, setFilters] = useState({
+    selectedCategory: '',
+    selectedPhoneModel: '',
+    selectedPhoneType: '',
+  });
 
   const searchParams = new URLSearchParams(location.search);
   const searchTerm = searchParams.get('search');
@@ -60,6 +66,10 @@ const Products = () => {
         console.error("There was an error fetching the products from the category!", error);
       });
   };
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    // Add logic to handle the filter changes, e.g., fetch filtered data
+  };
 
   const searchProducts = (term) => {
     http.get(`/api/sanpham/search/${encodeURIComponent(term)}`)
@@ -95,7 +105,7 @@ const Products = () => {
     ))
   ) : (
     <Col>
-      <p>Không tìm thấy sản phẩm nào với từ khóa "{searchTerm}".</p>
+      <p>Không tìm thấy sản phẩm nào với từ khóa "{localStorage.getItem("searchTerm")}".</p>
     </Col>
   );
 
@@ -112,6 +122,7 @@ const Products = () => {
   return (
     <>
       <Header />
+      <Filter onFilterChange={handleFilterChange} />
       <Container>
         <Row style={{ marginTop: "20px" }}>{listProducts}</Row>
         <Row>
