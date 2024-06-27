@@ -7,11 +7,11 @@ import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import Pagination from "react-bootstrap/Pagination";
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button'; // Import Button from react-bootstrap
+import Button from 'react-bootstrap/Button';
 import http from "../HTTP/http";
 import { useLocation } from 'react-router-dom';
 import { Link } from "react-router-dom";
-import "../CSS/filter.css"; // Import CSS file for additional styling
+import "../CSS/filter.css";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -27,6 +27,7 @@ const Products = () => {
     type: [],
     line: [],
   });
+  const [noProducts, setNoProducts] = useState(false);
 
   const searchParams = new URLSearchParams(location.search);
   const searchTerm = searchParams.get('search');
@@ -41,7 +42,7 @@ const Products = () => {
     } else {
       loadProducts();
     }
-  }, [localStorage.getItem("searchTerm"),localStorage.getItem("selectedCategoryId"),page, filters]);
+  }, [localStorage.getItem("searchTerm"), localStorage.getItem("selectedCategoryId"), page]);
 
   const fetchData = async () => {
     try {
@@ -53,6 +54,13 @@ const Products = () => {
 
       const productLinesResponse = await http.get("/api/danhmucsp");
       setProductLines(productLinesResponse.data);
+
+      // Reset filters here
+      setFilters({
+        brand: [],
+        type: [],
+        line: [],
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -65,10 +73,18 @@ const Products = () => {
   const loadProducts = () => {
     http.get(`/api/sanpham`)
       .then((response) => {
-        console.log("Products data:", response.data); // Check if data is received
+        console.log("Products data:", response.data);
         const totalPages = Math.ceil(response.data.length / value);
         setProducts(response.data);
         setTotalPages(totalPages);
+        setNoProducts(false);
+
+        // Reset filters here
+        setFilters({
+          brand: [],
+          type: [],
+          line: [],
+        });
       })
       .catch((error) => {
         console.error("There was an error fetching the products!", error);
@@ -81,6 +97,14 @@ const Products = () => {
       .then((response) => {
         setProducts(response.data);
         setTotalPages(Math.ceil(response.data.length / value));
+        setNoProducts(false);
+
+        // Reset filters here
+        setFilters({
+          brand: [],
+          type: [],
+          line: [],
+        });
       })
       .catch((error) => {
         console.error("There was an error fetching the products from the category!", error);
@@ -97,21 +121,21 @@ const Products = () => {
       newFilters[filterType].push(id);
     }
     setFilters(newFilters);
-  
+
     // Log the ID of the checkbox
     console.log(`Checkbox ID (${filterType}):`, id);
   };
-  
+
   const handleApplyFilters = () => {
     fetchFilteredProducts();
   };
-  
+
   const fetchFilteredProducts = () => {
     const { brand, type, line } = filters;
-  
+
     // Constructing query parameters manually
     let params = '';
-  
+
     if (brand.length) {
       params += `idDongDT=${brand.join(',')}&`;
     }
@@ -121,37 +145,48 @@ const Products = () => {
     if (line.length) {
       params += `idDanhMuc=${line.join(',')}`;
     }
-  
+
     // Removing the trailing '&' if present
     if (params.endsWith('&')) {
       params = params.slice(0, -1);
     }
-  
+
     // Sending GET request using axios
     http.get(`/api/sanpham/filter?${params}`)
       .then((response) => {
-        setProducts(response.data);
-        setTotalPages(Math.ceil(response.data.length / value));
+        if (response.data === false) {
+          setNoProducts(true);
+          setProducts([]);
+          setTotalPages(1);
+        } else {
+          setProducts(response.data);
+          setTotalPages(Math.ceil(response.data.length / value));
+          setNoProducts(false);
+        }
       })
       .catch((error) => {
         console.error("There was an error fetching the filtered products!", error);
       });
   };
-  
-  
-  
-  
+
   const searchProducts = (term) => {
     http.get(`/api/sanpham/search/${encodeURIComponent(term)}`)
       .then((response) => {
         setProducts(response.data);
         setTotalPages(Math.ceil(response.data.length / value));
+        setNoProducts(false);
+
+        // Reset filters here
+        setFilters({
+          brand: [],
+          type: [],
+          line: [],
+        });
       })
       .catch((error) => {
         console.error("There was an error searching the products!", error);
       });
   };
-
 
   const startIndex = (page - 1) * value;
   const currentProducts = products.slice(startIndex, startIndex + value);
@@ -204,6 +239,7 @@ const Products = () => {
                   type="checkbox"
                   id={`type-${type.idLoaiDT}`}
                   label={type.tenLoaiDienThoai}
+                  checked={filters.type.includes(type.idLoaiDT)}
                   onChange={() => handleFilterChange('type', type.idLoaiDT)}
                 />
               ))}
@@ -216,6 +252,7 @@ const Products = () => {
                   type="checkbox"
                   id={`brand-${brand.idDongDT}`}
                   label={brand.tenDongDT}
+                  checked={filters.brand.includes(brand.idDongDT)}
                   onChange={() => handleFilterChange('brand', brand.idDongDT)}
                 />
               ))}
@@ -228,14 +265,23 @@ const Products = () => {
                   type="checkbox"
                   id={`line-${line.idDanhMuc}`}
                   label={line.tenDanhMuc}
+                  checked={filters.line.includes(line.idDanhMuc)}
                   onChange={() => handleFilterChange('line', line.idDanhMuc)}
                 />
               ))}
             </div>
-            <Button variant="dark" onClick={handleApplyFilters} className="mt-3"  >Áp dụng</Button>
+            <Button variant="dark" onClick={handleApplyFilters} className="mt-3">Áp dụng</Button>
           </Col>
           <Col xs={12} lg={9}>
-            <Row style={{ marginTop: "20px" }}>{listProducts}</Row>
+            <Row style={{ marginTop: "20px" }}>
+              {noProducts ? (
+                <Col>
+                  <p>Không có kết quả phù hợp với bộ lọc.</p>
+                </Col>
+              ) : (
+                listProducts
+              )}
+            </Row>
             <Row>
               <Col className="d-flex justify-content-center py-3">
                 <Pagination>{listPage}</Pagination>
