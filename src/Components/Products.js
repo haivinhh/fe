@@ -3,14 +3,14 @@ import Footer from "../Common/Footer";
 import Header from "../Common/Header";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import Pagination from "react-bootstrap/Pagination";
+import Form from 'react-bootstrap/Form';
 import http from "../HTTP/http";
 import { useLocation } from 'react-router-dom';
 import { Link } from "react-router-dom";
-import Filter from "../Common/Filter";
+import "../CSS/filter.css"; // Import CSS file for additional styling
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -18,10 +18,13 @@ const Products = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const location = useLocation();
+  const [brands, setBrands] = useState([]);
+  const [phoneTypes, setPhoneTypes] = useState([]);
+  const [productLines, setProductLines] = useState([]);
   const [filters, setFilters] = useState({
-    selectedCategory: '',
-    selectedPhoneModel: '',
-    selectedPhoneType: '',
+    brand: [],
+    type: [],
+    line: [],
   });
 
   const searchParams = new URLSearchParams(location.search);
@@ -29,6 +32,7 @@ const Products = () => {
 
   useEffect(() => {
     document.title = "MCase";
+    fetchData();
     if (localStorage.getItem("selectedCategoryId")) {
       loadProductsFromCate();
     } else if (localStorage.getItem("searchTerm")) {
@@ -38,9 +42,23 @@ const Products = () => {
     }
   }, [localStorage.getItem("searchTerm"), page, localStorage.getItem("selectedCategoryId")]);
 
+  const fetchData = async () => {
+    try {
+      const brandsResponse = await http.get("/api/dongdt");
+      setBrands(brandsResponse.data);
+
+      const phoneTypesResponse = await http.get("/api/loaiDT");
+      setPhoneTypes(phoneTypesResponse.data);
+
+      const productLinesResponse = await http.get("/api/danhmucsp");
+      setProductLines(productLinesResponse.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   const clickPage = (e) => {
     setPage(parseInt(e.target.text));
-    
   };
 
   const loadProducts = () => {
@@ -66,7 +84,14 @@ const Products = () => {
         console.error("There was an error fetching the products from the category!", error);
       });
   };
-  const handleFilterChange = (newFilters) => {
+
+  const handleFilterChange = (filterType, id) => {
+    const newFilters = { ...filters };
+    if (newFilters[filterType].includes(id)) {
+      newFilters[filterType] = newFilters[filterType].filter((filterId) => filterId !== id);
+    } else {
+      newFilters[filterType].push(id);
+    }
     setFilters(newFilters);
     // Add logic to handle the filter changes, e.g., fetch filtered data
   };
@@ -91,7 +116,7 @@ const Products = () => {
 
   const listProducts = currentProducts.length > 0 ? (
     currentProducts.map((product) => (
-      <Col sm={4} key={product.idSanPham} className="d-flex">
+      <Col md={4} key={product.idSanPham} className="d-flex">
         <Card style={{ width: "18rem", marginTop: "50px" }} className="flex-fill">
           <Link to={`/sanpham/detail/${product.idSanPham}`} className="text-dark no-underline">
             <Card.Img variant="top" src={product.hinhSP} className="product-image mb-3" />
@@ -122,12 +147,61 @@ const Products = () => {
   return (
     <>
       <Header />
-      <Filter onFilterChange={handleFilterChange} />
-      <Container>
-        <Row style={{ marginTop: "20px" }}>{listProducts}</Row>
+      <Container fluid>
         <Row>
-          <Col className="d-flex justify-content-center py-3">
-            <Pagination>{listPage}</Pagination>
+          <Col xs={12} lg={2} className="filter-container">
+            <div className="filter-section">
+              <h5>Chọn dòng điện thoại</h5>
+              <Form.Select aria-label="Chọn dòng điện thoại">
+                {brands.map((brand) => (
+                  <option 
+                    key={brand.idDongDT} 
+                    value={brand.idDongDT}
+                    onClick={() => handleFilterChange('brand', brand.idDongDT)}
+                  >
+                    {brand.tenDongDT}
+                  </option>
+                ))}
+              </Form.Select>
+            </div>
+
+            <div className="filter-section">
+              <h5>Chọn loại điện thoại</h5>
+              <Form.Select aria-label="Chọn loại điện thoại">
+                {phoneTypes.map((type) => (
+                  <option 
+                    key={type.idLoaiDT} 
+                    value={type.idLoaiDT}
+                    onClick={() => handleFilterChange('type', type.idLoaiDT)}
+                  >
+                    {type.tenLoaiDienThoai}
+                  </option>
+                ))}
+              </Form.Select>
+            </div>
+
+            <div className="filter-section">
+              <h5>Chọn dòng sản phẩm</h5>
+              <Form.Select aria-label="Chọn dòng sản phẩm">
+                {productLines.map((line) => (
+                  <option 
+                    key={line.idDanhMuc} 
+                    value={line.idDanhMuc}
+                    onClick={() => handleFilterChange('line', line.idDanhMuc)}
+                  >
+                    {line.tenDanhMuc}
+                  </option>
+                ))}
+              </Form.Select>
+            </div>
+          </Col>
+          <Col xs={12} lg={9}>
+            <Row style={{ marginTop: "20px" }}>{listProducts}</Row>
+            <Row>
+              <Col className="d-flex justify-content-center py-3">
+                <Pagination>{listPage}</Pagination>
+              </Col>
+            </Row>
           </Col>
         </Row>
       </Container>

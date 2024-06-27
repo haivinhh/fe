@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
+import Form from 'react-bootstrap/Form';
 import http from "../HTTP/http";
 import "../CSS/filter.css"; // Import CSS file for additional styling
 
@@ -29,30 +28,45 @@ const Filter = ({ onChange }) => {
   }, []);
 
   return (
-    <div className="filter-container d-flex justify-content-center mt-4">
-      <DropdownButton id="dropdown-brand" title="Chọn dòng điện thoại" className="mx-2 custom-dropdown" variant="dark">
+    <div className="filter-container d-flex flex-column mt-4">
+      <div className="filter-section">
+        <h5>Chọn dòng điện thoại</h5>
         {brands.map((brand) => (
-          <Dropdown.Item key={brand.idDongDT} onSelect={() => onChange('brand', brand.idDongDT)}>
-            {brand.tenDongDT}
-          </Dropdown.Item>
+          <Form.Check 
+            key={brand.idDongDT} 
+            type="checkbox" 
+            id={`brand-${brand.idDongDT}`} 
+            label={brand.tenDongDT} 
+            onChange={() => onChange('brand', brand.idDongDT)} 
+          />
         ))}
-      </DropdownButton>
+      </div>
 
-      <DropdownButton id="dropdown-phone-type" title="Chọn loại điện thoại" className="mx-2 custom-dropdown" variant="dark">
+      <div className="filter-section">
+        <h5>Chọn loại điện thoại</h5>
         {phoneTypes.map((type) => (
-          <Dropdown.Item key={type.idLoaiDT} onSelect={() => onChange('type', type.idLoaiDT)}>
-            {type.tenLoaiDienThoai}
-          </Dropdown.Item>
+          <Form.Check 
+            key={type.idLoaiDT} 
+            type="checkbox" 
+            id={`type-${type.idLoaiDT}`} 
+            label={type.tenLoaiDienThoai} 
+            onChange={() => onChange('type', type.idLoaiDT)} 
+          />
         ))}
-      </DropdownButton>
+      </div>
 
-      <DropdownButton id="dropdown-product-line" title="Chọn dòng sản phẩm" className="mx-2 custom-dropdown" variant="dark">
+      <div className="filter-section">
+        <h5>Chọn dòng sản phẩm</h5>
         {productLines.map((line) => (
-          <Dropdown.Item key={line.idDanhMuc} onSelect={() => onChange('line', line.idDanhMuc)}>
-            {line.tenDanhMuc}
-          </Dropdown.Item>
+          <Form.Check 
+            key={line.idDanhMuc} 
+            type="checkbox" 
+            id={`line-${line.idDanhMuc}`} 
+            label={line.tenDanhMuc} 
+            onChange={() => onChange('line', line.idDanhMuc)} 
+          />
         ))}
-      </DropdownButton>
+      </div>
     </div>
   );
 };
