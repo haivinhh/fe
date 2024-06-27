@@ -7,6 +7,7 @@ import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import Pagination from "react-bootstrap/Pagination";
 import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button'; // Import Button from react-bootstrap
 import http from "../HTTP/http";
 import { useLocation } from 'react-router-dom';
 import { Link } from "react-router-dom";
@@ -40,7 +41,7 @@ const Products = () => {
     } else {
       loadProducts();
     }
-  }, [localStorage.getItem("searchTerm"), page, localStorage.getItem("selectedCategoryId")]);
+  }, [localStorage.getItem("searchTerm"),localStorage.getItem("selectedCategoryId"),page, filters]);
 
   const fetchData = async () => {
     try {
@@ -64,6 +65,7 @@ const Products = () => {
   const loadProducts = () => {
     http.get(`/api/sanpham`)
       .then((response) => {
+        console.log("Products data:", response.data); // Check if data is received
         const totalPages = Math.ceil(response.data.length / value);
         setProducts(response.data);
         setTotalPages(totalPages);
@@ -88,14 +90,57 @@ const Products = () => {
   const handleFilterChange = (filterType, id) => {
     const newFilters = { ...filters };
     if (newFilters[filterType].includes(id)) {
-      newFilters[filterType] = newFilters[filterType].filter((filterId) => filterId !== id);
+      newFilters[filterType] = newFilters[filterType].filter(
+        (filterId) => filterId !== id
+      );
     } else {
       newFilters[filterType].push(id);
     }
     setFilters(newFilters);
-    // Add logic to handle the filter changes, e.g., fetch filtered data
+  
+    // Log the ID of the checkbox
+    console.log(`Checkbox ID (${filterType}):`, id);
   };
-
+  
+  const handleApplyFilters = () => {
+    fetchFilteredProducts();
+  };
+  
+  const fetchFilteredProducts = () => {
+    const { brand, type, line } = filters;
+  
+    // Constructing query parameters manually
+    let params = '';
+  
+    if (brand.length) {
+      params += `idDongDT=${brand.join(',')}&`;
+    }
+    if (type.length) {
+      params += `idLoaiDT=${type.join(',')}&`;
+    }
+    if (line.length) {
+      params += `idDanhMuc=${line.join(',')}`;
+    }
+  
+    // Removing the trailing '&' if present
+    if (params.endsWith('&')) {
+      params = params.slice(0, -1);
+    }
+  
+    // Sending GET request using axios
+    http.get(`/api/sanpham/filter?${params}`)
+      .then((response) => {
+        setProducts(response.data);
+        setTotalPages(Math.ceil(response.data.length / value));
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the filtered products!", error);
+      });
+  };
+  
+  
+  
+  
   const searchProducts = (term) => {
     http.get(`/api/sanpham/search/${encodeURIComponent(term)}`)
       .then((response) => {
@@ -106,6 +151,7 @@ const Products = () => {
         console.error("There was an error searching the products!", error);
       });
   };
+
 
   const startIndex = (page - 1) * value;
   const currentProducts = products.slice(startIndex, startIndex + value);
@@ -151,49 +197,42 @@ const Products = () => {
         <Row>
           <Col xs={12} lg={2} className="filter-container">
             <div className="filter-section">
-              <h5>Chọn dòng điện thoại</h5>
-              <Form.Select aria-label="Chọn dòng điện thoại">
-                {brands.map((brand) => (
-                  <option 
-                    key={brand.idDongDT} 
-                    value={brand.idDongDT}
-                    onClick={() => handleFilterChange('brand', brand.idDongDT)}
-                  >
-                    {brand.tenDongDT}
-                  </option>
-                ))}
-              </Form.Select>
+              <h5>LOẠI ĐIỆN THOẠI</h5>
+              {phoneTypes.map((type) => (
+                <Form.Check 
+                  key={type.idLoaiDT} 
+                  type="checkbox"
+                  id={`type-${type.idLoaiDT}`}
+                  label={type.tenLoaiDienThoai}
+                  onChange={() => handleFilterChange('type', type.idLoaiDT)}
+                />
+              ))}
             </div>
-
             <div className="filter-section">
-              <h5>Chọn loại điện thoại</h5>
-              <Form.Select aria-label="Chọn loại điện thoại">
-                {phoneTypes.map((type) => (
-                  <option 
-                    key={type.idLoaiDT} 
-                    value={type.idLoaiDT}
-                    onClick={() => handleFilterChange('type', type.idLoaiDT)}
-                  >
-                    {type.tenLoaiDienThoai}
-                  </option>
-                ))}
-              </Form.Select>
+              <h5>DÒNG ĐIỆN THOẠI</h5>
+              {brands.map((brand) => (
+                <Form.Check 
+                  key={brand.idDongDT} 
+                  type="checkbox"
+                  id={`brand-${brand.idDongDT}`}
+                  label={brand.tenDongDT}
+                  onChange={() => handleFilterChange('brand', brand.idDongDT)}
+                />
+              ))}
             </div>
-
             <div className="filter-section">
-              <h5>Chọn dòng sản phẩm</h5>
-              <Form.Select aria-label="Chọn dòng sản phẩm">
-                {productLines.map((line) => (
-                  <option 
-                    key={line.idDanhMuc} 
-                    value={line.idDanhMuc}
-                    onClick={() => handleFilterChange('line', line.idDanhMuc)}
-                  >
-                    {line.tenDanhMuc}
-                  </option>
-                ))}
-              </Form.Select>
+              <h5>LOẠI SẢN PHẨM</h5>
+              {productLines.map((line) => (
+                <Form.Check 
+                  key={line.idDanhMuc} 
+                  type="checkbox"
+                  id={`line-${line.idDanhMuc}`}
+                  label={line.tenDanhMuc}
+                  onChange={() => handleFilterChange('line', line.idDanhMuc)}
+                />
+              ))}
             </div>
+            <Button variant="dark" onClick={handleApplyFilters} className="mt-3"  >Áp dụng</Button>
           </Col>
           <Col xs={12} lg={9}>
             <Row style={{ marginTop: "20px" }}>{listProducts}</Row>

@@ -19,9 +19,11 @@
   margin-bottom: 10px;
 }
 
-.filter-section .form-check-label {
-  text-align: left; /* Left-align the text */
+.filter-section .form-check{
+  text-align: left; /* Ensure text alignment is left */
+  
 }
+
 .filter-section h5 {
   text-align: left;
 }
