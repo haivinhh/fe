@@ -10,6 +10,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from "../Icon/logo.jpg";
 import http from "../HTTP/http";
 import '../CSS/header.css';
+import { ShoppingCartOutlined } from '@ant-design/icons';
 
 const Header = ({ onSearch }) => {
   const [categories, setCategories] = useState([]);
@@ -35,6 +36,10 @@ const Header = ({ onSearch }) => {
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleCartClick = () => {
+    navigate('/cart'); // Điều hướng đến trang giỏ hàng
   };
 
   const handleSearchSubmit = (event) => {
@@ -66,7 +71,7 @@ const Header = ({ onSearch }) => {
 
   return (
     <>
-      <Navbar expand="lg" >
+      <Navbar expand="lg">
         <Container fluid>
           <Navbar.Brand href="#">
             <img
@@ -94,13 +99,16 @@ const Header = ({ onSearch }) => {
                 aria-label="Tìm kiếm"
                 value={searchTerm}
                 onChange={handleSearchChange}
+                
               />
-            </Form>
-            
-          </Navbar.Collapse>
-          <Button variant="dark" type="submit" className="button" >
+              <Button variant="dark" type="submit" className="custom-search-button">
                 Tìm kiếm
               </Button>
+            </Form>
+            <Button variant="dark" onClick={handleCartClick} style={{ marginLeft: '10px' }}>
+              <ShoppingCartOutlined style={{ fontSize: '24px', color: 'white' }} />
+            </Button>
+          </Navbar.Collapse>
         </Container>
       </Navbar>
     </>

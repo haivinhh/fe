@@ -31,6 +31,7 @@ const DetailProduct = () => {
       .then((response) => {
         console.log(response.data);
         setProduct(response.data);
+        console.log(response.data.idSanPham);
       })
       .catch((error) => {
         console.error("There was an error fetching the product!", error);
@@ -42,6 +43,7 @@ const DetailProduct = () => {
       .then((response) => {
         console.log(response.data);
         setPhoneModels(response.data);
+        console.log(response.data.idSanPham);
       })
       .catch((error) => {
         console.error("There was an error fetching the phone models!", error);

@@ -15,10 +15,12 @@
   height: 38px; /* Adjust the height as needed */
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  margin-right: 300px;
 }
 
 .custom-search-button {
-  height: 38px; /* Match the height of the input */
+  height: 38px;
+  width: 130px; /* Match the height of the input */
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   transition: background-color 0.3s, color 0.3s;

@@ -3,6 +3,7 @@ import Home from './Components/Home';
 import Admin from './Components/Admin/admin';
 import Products from "./Components/Products";
 import DetailProduct from './Components/DetailProduct';
+import Cart from './Components/Cart';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           
           <Route path="/sanpham/danhmuc/:idDanhMuc" element={<Products/>} />
           <Route path="/sanpham/detail/:idSanPham" element={<DetailProduct />} />
+          <Route path="/cart" element={<Cart />} />
         </Routes>
       </Router>
     </div>

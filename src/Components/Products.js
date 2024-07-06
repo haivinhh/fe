@@ -12,6 +12,7 @@ import http from "../HTTP/http";
 import { useLocation } from 'react-router-dom';
 import { Link } from "react-router-dom";
 import "../CSS/filter.css";
+import "../CSS/checkbox.css";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -240,6 +241,7 @@ const Products = () => {
                   id={`type-${type.idLoaiDT}`}
                   label={type.tenLoaiDienThoai}
                   checked={filters.type.includes(type.idLoaiDT)}
+                  className="custom-checkbox"
                   onChange={() => handleFilterChange('type', type.idLoaiDT)}
                 />
               ))}
@@ -253,6 +255,7 @@ const Products = () => {
                   id={`brand-${brand.idDongDT}`}
                   label={brand.tenDongDT}
                   checked={filters.brand.includes(brand.idDongDT)}
+                  className="custom-checkbox"
                   onChange={() => handleFilterChange('brand', brand.idDongDT)}
                 />
               ))}
@@ -266,6 +269,7 @@ const Products = () => {
                   id={`line-${line.idDanhMuc}`}
                   label={line.tenDanhMuc}
                   checked={filters.line.includes(line.idDanhMuc)}
+                  className="custom-checkbox"
                   onChange={() => handleFilterChange('line', line.idDanhMuc)}
                 />
               ))}

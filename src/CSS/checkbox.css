@@ -1,0 +1,15 @@
+/* customCheckbox.css */
+.custom-checkbox .form-check-input:checked {
+    background-color: black;
+    border-color: black;
+  }
+  
+  .custom-checkbox .form-check-input:checked::before {
+    border-color: black;
+  }
+  
+  .custom-checkbox .form-check-input:checked::after {
+    background-color: black;
+    border-color: black;
+  }
+  
