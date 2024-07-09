@@ -1,22 +1,17 @@
-// src/Common/Header.js
 import React, { useState, useEffect } from "react";
-import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
+import { Button, Container, Form, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
 import logo from "../Icon/logo.jpg";
 import http from "../HTTP/http";
 import '../CSS/header.css';
-import { ShoppingCartOutlined } from '@ant-design/icons';
 
 const Header = ({ onSearch }) => {
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // Example state for login status
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -39,7 +34,7 @@ const Header = ({ onSearch }) => {
   };
 
   const handleCartClick = () => {
-    navigate('/cart'); // Điều hướng đến trang giỏ hàng
+    navigate('/cart'); // Navigate to cart page
   };
 
   const handleSearchSubmit = (event) => {
@@ -47,7 +42,7 @@ const Header = ({ onSearch }) => {
     if (searchTerm.trim()) {
       localStorage.removeItem('selectedCategoryId'); // Clear selectedCategoryId on search
       localStorage.setItem('searchTerm', searchTerm);
-      navigate(`/sanpham/search=${encodeURIComponent(searchTerm)}`); // Use navigate for routing
+      navigate(`/sanpham/search=${encodeURIComponent(searchTerm)}`); // Navigate to search results
     }
   };
 
@@ -56,18 +51,25 @@ const Header = ({ onSearch }) => {
     localStorage.removeItem('searchTerm');
   };
 
-  const cates = categories.map((value) => (
-    <NavDropdown.Item
-      key={value.idDanhMuc}
-      as={Link}
-      to={'/sanpham/danhmuc/' + value.idDanhMuc}
-      onClick={() => handleCategoryClick(value.idDanhMuc)}
-      className="text-black"
-      style={{ textDecoration: "none" }}
+  const handleLoginClick = () => {
+    navigate('/login'); // Navigate to login page
+  };
+
+  const handleLogoutClick = () => {
+    // Implement logout logic here
+    setIsLoggedIn(false);
+  };
+
+  const userDropdown = (
+    <NavDropdown
+      title={<Button variant="dark" style={{ marginLeft: '10px' }}><UserOutlined style={{ fontSize: '24px', color: 'white' }} /></Button>}
+      id="basic-nav-dropdown"
+      align="end"
     >
-      {value.tenDanhMuc}
-    </NavDropdown.Item>
-  ));
+      <NavDropdown.Item onClick={handleLogoutClick}>Đăng xuất</NavDropdown.Item>
+      <NavDropdown.Item as={Link} to="/profile">Trang cá nhân</NavDropdown.Item>
+    </NavDropdown>
+  );
 
   return (
     <>
@@ -85,7 +87,18 @@ const Header = ({ onSearch }) => {
             <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: "100px" }} navbarScroll>
               <Nav.Link href="/">Trang chủ</Nav.Link>
               <NavDropdown title="Danh mục sản phẩm" id="navbarScrollingDropdown">
-                {cates}
+                {categories.map((value) => (
+                  <NavDropdown.Item
+                    key={value.idDanhMuc}
+                    as={Link}
+                    to={`/sanpham/danhmuc/${value.idDanhMuc}`}
+                    onClick={() => handleCategoryClick(value.idDanhMuc)}
+                    className="text-black"
+                    style={{ textDecoration: "none" }}
+                  >
+                    {value.tenDanhMuc}
+                  </NavDropdown.Item>
+                ))}
               </NavDropdown>
               <Nav.Link as={Link} to="/sanpham" onClick={handleSanPhamClick}>
                 Sản Phẩm
@@ -99,7 +112,6 @@ const Header = ({ onSearch }) => {
                 aria-label="Tìm kiếm"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                
               />
               <Button variant="dark" type="submit" className="custom-search-button">
                 Tìm kiếm
@@ -108,6 +120,13 @@ const Header = ({ onSearch }) => {
             <Button variant="dark" onClick={handleCartClick} style={{ marginLeft: '10px' }}>
               <ShoppingCartOutlined style={{ fontSize: '24px', color: 'white' }} />
             </Button>
+            {isLoggedIn ? (
+              userDropdown
+            ) : (
+              <Button variant="dark" onClick={handleLoginClick} style={{ marginLeft: '10px' }}>
+                <UserOutlined style={{ fontSize: '24px', color: 'white' }} />
+              </Button>
+            )}
           </Navbar.Collapse>
         </Container>
       </Navbar>

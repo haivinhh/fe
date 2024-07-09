@@ -1,47 +1,62 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "../Common/Header";
 import Footer from "../Common/Footer";
-import http from "../HTTP/http";
+import { getCart } from "../redux/apiRequest";
+import '../CSS/cart.css'; // Import file CSS
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([]);
+  const currentUser = useSelector((state) => state.auth.login?.currentUser);
+  const cartData = useSelector((state) => state.cart.cart.allCart);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    // Gọi API để lấy dữ liệu giỏ hàng
-    const fetchCartItems = async () => {
-      try {
-        const response = await http.get("/api/cart");
-        setCartItems(response.data); // Giả sử response.data chứa dữ liệu giỏ hàng
-      } catch (error) {
-        console.error("Error fetching cart items:", error);
-      }
-    };
+    if (currentUser?.accessToken) {
+      getCart(currentUser.accessToken, dispatch);
+    }
+  }, [currentUser, dispatch]);
 
-    fetchCartItems();
-  }, []);
+  const calculateTotalPrice = () => {
+    if (cartData && cartData.length > 0) {
+      return cartData.reduce((total, item) => total + item.soLuong * item.donGia, 0);
+    }
+    return 0;
+  };
 
   return (
     <>
       <Header />
       <div className="cart-container">
-        <h2>Your Cart</h2>
-        {cartItems.length === 0 ? (
-          <p>Your cart is empty.</p>
-        ) : (
-          <ul>
-            {cartItems.map((item) => (
-              <li key={item.idSanPham}>
-                <img src={item.hinhSP} alt={item.tenSanPham} style={{ width: "100px", height: "100px", objectFit: "cover" }} />
-                <div>
-                  <h3>{item.tenSanPham}</h3>
-                  <p>Quantity: {item.soLuong}</p>
-                  <p>Price: {item.donGia}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+  <h2>Giỏ Hàng</h2>
+  {cartData && cartData.length === 0 ? (
+    <p>Giỏ hàng của bạn đang trống.</p>
+  ) : (
+    <div className="cart-list-container">
+      <ul className="cart-list">
+        {cartData && cartData.map((item) => (
+          <li key={item.idSanPham} className="cart-item">
+            <img
+              src={item.hinhSP}
+              alt={item.tenSanPham}
+              className="cart-item-image"
+            />
+            <div className="cart-item-details">
+              <h3>{item.tenSanPham}</h3>
+              <p>Số lượng: {item.soLuong}</p>
+              <p>Giá: {item.donGia} VND</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <div className="cart-summary">
+    <p>Tổng Tiền Đơn Hàng: {calculateTotalPrice()} VND</p>
+  </div>
+  <button className="checkout-button">Thanh Toán</button>
+    </div>
+  )}
+  
+</div>
+
       <Footer />
     </>
   );
