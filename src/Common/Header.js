@@ -1,17 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { Button, Container, Form, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
+import { useDispatch, useSelector } from "react-redux";
 import logo from "../Icon/logo.jpg";
 import http from "../HTTP/http";
 import '../CSS/header.css';
+import { logOutCus } from "../redux/apiRequest";
+import { createAxios } from "../redux/createInstance";
+import { logOutSuccess } from "../redux/authSlice";
+import { getCartLogout } from "../redux/cartSlice";
 
 const Header = ({ onSearch }) => {
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Example state for login status
+  
+  const dispatch = useDispatch();
+  const customer = useSelector((state) => state.auth.login?.currentUser);
+  const accessToken = customer?.accessToken;
+  const idUser = customer?.idUser;
+  let axiosJWT = createAxios(customer, dispatch, logOutSuccess, getCartLogout);
+
+  const handleLogoutClick = () => {
+    logOutCus(dispatch, idUser, navigate, accessToken, axiosJWT);
+  };
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -53,11 +66,6 @@ const Header = ({ onSearch }) => {
 
   const handleLoginClick = () => {
     navigate('/login'); // Navigate to login page
-  };
-
-  const handleLogoutClick = () => {
-    // Implement logout logic here
-    setIsLoggedIn(false);
   };
 
   const userDropdown = (
@@ -120,7 +128,7 @@ const Header = ({ onSearch }) => {
             <Button variant="dark" onClick={handleCartClick} style={{ marginLeft: '10px' }}>
               <ShoppingCartOutlined style={{ fontSize: '24px', color: 'white' }} />
             </Button>
-            {isLoggedIn ? (
+            {accessToken ? (
               userDropdown
             ) : (
               <Button variant="dark" onClick={handleLoginClick} style={{ marginLeft: '10px' }}>

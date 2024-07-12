@@ -2,65 +2,52 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../Common/Header";
 import Footer from "../Common/Footer";
-import { getCart } from "../redux/apiRequest";
-import "../CSS/cart.css"; // Import file CSS
-//import { axiosJWT } from "../HTTP/http";
-import http from "../HTTP/http";
-import { jwtDecode } from "jwt-decode";
+import { getCart, deleteCartItem } from "../redux/apiRequest"; // Import deleteCartItem từ apiRequest
 import { loginSuccess } from "../redux/authSlice";
-import axios from "axios";
+import { createAxios } from "../redux/createInstance";
+import "../CSS/cart.css";
+
 const Cart = () => {
-  const currentUser = useSelector((state) => state.auth.login?.currentUser);
+  const customer = useSelector((state) => state.auth.login?.currentUser);
   const cartData = useSelector((state) => state.cart.cart.allCart);
   const dispatch = useDispatch();
-  let axiosJWT = axios.create({
-    baseURL: "http://localhost:3001",
-    withCredentials: true,
-  });
-  const refreshToken = async () => {
-    try {
-      const res = await http.post("/api/refreshtokencus", {});
-      console.log("Cookies from response headers:", res.headers["set-cookie"]);
-      return res.data;
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  axiosJWT.interceptors.request.use(
-    async (config) => {
-      let date = new Date();
-      const decodedToken = jwtDecode(currentUser?.accessToken);
-      if (decodedToken.exp < date.getTime() / 1000) {
-        const data = await refreshToken();
-        const refreshCustomer = {
-          ...currentUser,
-          accessToken: data.accessToken,
-        };
-        dispatch(loginSuccess(refreshCustomer));
-        config.headers["token"] = "Bearer " + data.accessToken;
-      }
-      return config;
-    },
-    (err) => {
-      return Promise.reject(err);
-    }
-  );
 
   useEffect(() => {
-    if (currentUser?.accessToken) {
-      getCart(currentUser.accessToken, dispatch, axiosJWT);
-    }
-  }, [currentUser, dispatch]);
+    const axiosJWT = createAxios(customer, dispatch, loginSuccess);
 
-  const calculateTotalPrice = () => {
-    if (cartData && cartData.length > 0) {
-      return cartData.reduce(
-        (total, item) => total + item.soLuong * item.donGia,
-        0
-      );
-    }
-    return 0;
+    const fetchCart = async () => {
+      if (customer?.accessToken) {
+        await getCart(customer.accessToken, dispatch, axiosJWT);
+      }
+    };
+
+    fetchCart();
+  }, [customer, dispatch]);
+
+  const formatPrice = (price) => {
+    return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
   };
+
+  const handleDeleteCartItem = async (idChiTietDH) => {
+    const axiosJWT = createAxios(customer, dispatch, loginSuccess);
+    try {
+      
+      const result = await deleteCartItem(idChiTietDH, customer.accessToken, axiosJWT, dispatch);
+
+      if (result.success) {
+        alert("Xóa sản phẩm khỏi giỏ hàng thành công");
+        // Sau khi xóa thành công, cập nhật lại giỏ hàng
+        await getCart(customer.accessToken, dispatch, axiosJWT);
+      } else {
+        alert(`Xóa sản phẩm khỏi giỏ hàng thất bại: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa sản phẩm trong giỏ hàng:", error);
+      alert("Xóa sản phẩm khỏi giỏ hàng thất bại. Vui lòng thử lại sau.");
+    }
+  };
+
+
 
   return (
     <>
@@ -75,27 +62,26 @@ const Cart = () => {
               {cartData &&
                 cartData.map((item) => (
                   <li key={item.idSanPham} className="cart-item">
-                    <img
-                      src={item.hinhSP}
-                      alt={item.tenSanPham}
-                      className="cart-item-image"
-                    />
+                    <img src={item.hinhSP} alt={item.tenSanPham} className="cart-item-image" />
                     <div className="cart-item-details">
                       <h3>{item.tenSanPham}</h3>
                       <p>Số lượng: {item.soLuong}</p>
-                      <p>Giá: {item.donGia} VND</p>
+                      <p>Giá: {formatPrice(item.donGia)}</p>
+                      <p>Thành tiền: {formatPrice(item.tongTien)}</p>
+                      <button onClick={() => handleDeleteCartItem(item.idChiTietDH)} className="delete-button">Xóa</button>
                     </div>
                   </li>
                 ))}
             </ul>
             <div className="cart-summary">
-              <p>Tổng Tiền Đơn Hàng: {calculateTotalPrice()} VND</p>
+              {cartData && (
+                <p>Tổng Tiền Đơn Hàng: {formatPrice(cartData[0].tongTienDH)}</p>
+              )}
+              <button className="checkout-button">Thanh Toán</button>
             </div>
-            <button className="checkout-button">Thanh Toán</button>
           </div>
         )}
       </div>
-
       <Footer />
     </>
   );
