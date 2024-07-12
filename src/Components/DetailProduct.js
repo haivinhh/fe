@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom";
 import { Radio } from 'antd'; // Import Radio from antd
 import http from "../HTTP/http";
 import '../CSS/detailproducts.css'; // Import CSS file
+import { useDispatch, useSelector } from "react-redux";
 
 const DetailProduct = () => {
   const { idSanPham } = useParams();
@@ -20,6 +21,7 @@ const DetailProduct = () => {
   const [count, setCount] = useState(1);
   const [phoneModels, setPhoneModels] = useState([]);
   const [selectedPhoneModel, setSelectedPhoneModel] = useState(null);
+  const currentUser = useSelector((state) => state.auth.login?.currentUser);
 
   useEffect(() => {
     loadProduct();

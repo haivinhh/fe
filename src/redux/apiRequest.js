@@ -3,6 +3,7 @@ import http from "../HTTP/http"; // Giả sử import này đúng dựa trên c�
 import { loginFailed, loginStart, loginSuccess, registerFailed, registerStart, registerSuccess } from "./authSlice";
 import { getCartStart, getCartSuccess,getCartFailed } from "./cartSlice";
 
+
 export const loginUser = async (user, dispatch, navigate) => {
     dispatch(loginStart());
     try {
@@ -28,10 +29,10 @@ export const registerCus = async (user,dispatch,navigate) => {
     }
 };
 
-export const getCart = async (accessToken, dispatch) => {
+export const getCart = async (accessToken, dispatch,axiosJWT) => {
     dispatch(getCartStart());
     try {
-        const res = await http.get("/api/cart",{
+        const res = await axiosJWT.get("/api/cart",{
             headers: {token: `Bearer ${accessToken}`},
         });
         dispatch(getCartSuccess(res.data));

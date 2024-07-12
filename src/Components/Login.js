@@ -30,6 +30,7 @@ const Login = () => {
     const result = await loginUser(customer, dispatch, navigate);
     
     if (result.status === "success") {
+      
       setShowSuccessMessage(true);
       setShowErrorMessage(false);
       
