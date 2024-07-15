@@ -62,7 +62,7 @@ export const getCart = async (accessToken, dispatch, axiosJWT) => {
 export const addToCart = async (idSanPham, soLuong, accessToken, axiosJWT, dispatch) => {
     try {
       const response = await axiosJWT.post("/api/cart/add", { idSanPham, soLuong }, {
-        headers: { Authorization: `Bearer ${accessToken}` }
+        headers: { token: `Bearer ${accessToken}` }
       });
   
       // Assuming backend returns success: true for successful addition
@@ -76,10 +76,10 @@ export const addToCart = async (idSanPham, soLuong, accessToken, axiosJWT, dispa
       return { success: false, error: err.response?.data || err.message }; // Return false and error message for any error
     }
   };
-  export const updateCartItem = async (idChiTietDH, soLuong, accessToken) => {
+  export const updateCartItem = async (idChiTietDH, soLuong, accessToken,axiosJWT) => {
     try {
-      const response = await http.put("/api/cart/updatecartitem", { idChiTietDH, soLuong }, {
-        headers: { Authorization: `Bearer ${accessToken}` }
+      const response = await axiosJWT.put("/api/cart/updatecartitem", { idChiTietDH, soLuong }, {
+        headers: { token: `Bearer ${accessToken}` }
       });
   
       // Giả sử backend trả về success: true nếu cập nhật thành công
