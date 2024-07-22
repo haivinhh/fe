@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../Common/Header";
 import Footer from "../Common/Footer";
-import { getCart, deleteCartItem, updateCartItem } from "../redux/apiRequest";
+import { getDetailCart, deleteCartItem, updateCartItem } from "../redux/apiRequest";
 import { loginSuccess } from "../redux/authSlice";
 import { createAxios } from "../redux/createInstance";
 import Button from "react-bootstrap/Button";
@@ -21,7 +21,7 @@ const Cart = () => {
 
     const fetchCart = async () => {
       if (customer?.accessToken) {
-        await getCart(customer.accessToken, dispatch, axiosJWT);
+        await getDetailCart(customer.accessToken, dispatch, axiosJWT);
       }
     };
 
@@ -29,6 +29,9 @@ const Cart = () => {
   }, [customer, dispatch]);
 
   const formatPrice = (price) => {
+    if (price === undefined || price === null) {
+      return "0 VND";
+    }
     return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
   };
 
@@ -44,7 +47,7 @@ const Cart = () => {
 
       if (result.success) {
         alert("Xóa sản phẩm khỏi giỏ hàng thành công");
-        await getCart(customer.accessToken, dispatch, axiosJWT);
+        await getDetailCart(customer.accessToken, dispatch, axiosJWT);
       } else {
         alert(`Xóa sản phẩm khỏi giỏ hàng thất bại: ${result.error}`);
       }
@@ -68,8 +71,7 @@ const Cart = () => {
       const result = await updateCartItem(idChiTietDH, newQuantity, customer.accessToken, axiosJWT);
 
       if (result.success) {
-        await getCart(customer.accessToken, dispatch, axiosJWT);
-        alert ('Cập nhật số lượng thành công');
+        await getDetailCart(customer.accessToken, dispatch, axiosJWT);
       } else {
         alert(`Cập nhật số lượng thất bại: ${result.error}`);
       }
@@ -119,8 +121,8 @@ const Cart = () => {
                 ))}
             </ul>
             <div className="cart-summary">
-              {cartData && (
-                <p>Tổng Tiền Đơn Hàng: {formatPrice(cartData[0].tongTienDH)}</p>
+              {cartData && cartData.length > 0 && (
+                <p>Tổng Tiền Đơn Hàng: {formatPrice(cartData.reduce((acc, item) => acc + item.tongTien, 0))}</p>
               )}
               <Button variant="dark" className="checkout-button">Thanh Toán</Button>
             </div>

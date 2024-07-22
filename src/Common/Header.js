@@ -67,7 +67,9 @@ const Header = ({ onSearch }) => {
   const handleLoginClick = () => {
     navigate('/login'); // Navigate to login page
   };
-
+const handleProfileClick = () => {
+  navigate('/profilecustomer');
+}
   const userDropdown = (
     <NavDropdown
       title={<Button variant="dark" style={{ marginLeft: '10px' }}><UserOutlined style={{ fontSize: '24px', color: 'white' }} /></Button>}
@@ -75,7 +77,7 @@ const Header = ({ onSearch }) => {
       align="end"
     >
       <NavDropdown.Item onClick={handleLogoutClick}>Đăng xuất</NavDropdown.Item>
-      <NavDropdown.Item as={Link} to="/profile">Trang cá nhân</NavDropdown.Item>
+      <NavDropdown.Item onClick={handleProfileClick}>Trang cá nhân</NavDropdown.Item>
     </NavDropdown>
   );
 
