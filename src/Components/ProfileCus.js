@@ -1,11 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col, Form, Button, Table } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  InputGroup,
+  Table,
+} from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Header from "../Common/Header";
 import Footer from "../Common/Footer";
 import { createAxios } from "../redux/createInstance";
 import { loginSuccess } from "../redux/authSlice";
-import { getCusById, getCart } from "../redux/apiRequest";
+import {
+  getCusById,
+  getCart,
+  changePassword,
+  updateUser,
+} from "../redux/apiRequest";
 import "../CSS/profilecus.css";
 import edit from "../Icon/edit.png";
 
@@ -13,33 +28,61 @@ const ProfileCustomer = () => {
   const customer = useSelector((state) => state.auth.login?.currentUser);
   const [customerData, setCustomerData] = useState([]);
   const [cartData, setCartData] = useState([]);
-  const [isEditing, setIsEditing] = useState(null); // Track which field is being edited
-  const [editValue, setEditValue] = useState(""); // Store the new value for editing
+  const [isEditing, setIsEditing] = useState(null);
+  const [editValue, setEditValue] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  const [passwordChangeMessage, setPasswordChangeMessage] = useState("");
+  const [updateSuccessMessage, setUpdateSuccessMessage] = useState("");
+  const [updateErrorMessage, setUpdateErrorMessage] = useState("");
   const dispatch = useDispatch();
   const axiosJWT = createAxios(customer, dispatch, loginSuccess);
 
   const fetchCustomerData = async () => {
     if (customer?.accessToken) {
       try {
-        const dataCus = await getCusById(customer.idUser, customer.accessToken, axiosJWT);
-        setCustomerData(dataCus); // Assuming dataCus is an array
-      } catch (error) {
-        console.error("Error fetching customer data:", error);
-      }
+        const dataCus = await getCusById(
+          customer.idUser,
+          customer.accessToken,
+          axiosJWT
+        );
+        setCustomerData(dataCus);
+      } catch (error) {}
     }
   };
 
   const fetchCartData = async () => {
     if (customer?.accessToken) {
       try {
-        const data = await getCart(customer.idUser, customer.accessToken, axiosJWT);
+        const data = await getCart(
+          customer.idUser,
+          customer.accessToken,
+          axiosJWT
+        );
         setCartData(data);
-      } catch (error) {
-        console.error("Error fetching cart data:", error);
-      }
+      } catch (error) {}
     }
   };
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
 
+    const options = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false, // Use 24-hour format
+    };
+
+    const date = new Date(dateString);
+    return date.toLocaleString("vi-VN", options);
+  };
   useEffect(() => {
     fetchCustomerData();
     fetchCartData();
@@ -49,40 +92,121 @@ const ProfileCustomer = () => {
     if (price === undefined || price === null) {
       return "0 VND";
     }
-    return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
   };
 
   const customerInfo = customerData[0] || {};
 
-  // Mapping of field names to display labels
   const labelMapping = {
     hoTen: "Họ và tên",
     diaChi: "Địa chỉ",
     SDT: "Số điện thoại",
     email: "Email",
     userName: "Tên đăng nhập",
-    passWord: "Mật khẩu" // You can skip displaying this if you don't want it
+    passWord: "Mật khẩu",
   };
+
+  const orderedFields = ["hoTen", "SDT", "email", "diaChi"];
 
   const handleEditClick = (field) => {
     setIsEditing(field);
-    setEditValue(customerInfo[field] || ""); // Set current value to input
+    setEditValue(customerInfo[field] || "");
   };
 
   const handleSaveClick = async () => {
     if (isEditing) {
       try {
-        // Implement the save functionality
-        // Example: await updateCustomerData(customer.idUser, { [isEditing]: editValue }, customer.accessToken, axiosJWT);
-        setIsEditing(null); // Exit editing mode after saving
+        const response = await updateUser(
+          {
+            idUser: customer.idUser,
+            [isEditing]: editValue,
+          },
+          customer.accessToken,
+          axiosJWT
+        );
+
+        if (response.success) {
+          setUpdateSuccessMessage("Cập nhật thông tin thành công.");
+          fetchCustomerData();
+          setIsEditing(null);
+
+          // Clear the success message after 3 seconds
+          setTimeout(() => {
+            setUpdateSuccessMessage("");
+          }, 2000);
+        } else {
+          setUpdateErrorMessage(
+            response.message || "Lỗi khi cập nhật thông tin."
+          );
+          setTimeout(() => {
+            setUpdateErrorMessage("");
+          }, 2000); // Show error for 3 seconds
+        }
       } catch (error) {
-        console.error("Error updating customer data:", error);
+        setUpdateErrorMessage("Đã xảy ra lỗi khi cập nhật thông tin.");
       }
     }
   };
 
   const handleCancelClick = () => {
-    setIsEditing(null); // Exit editing mode without saving
+    setIsEditing(null);
+  };
+
+  const handlePasswordChange = async () => {
+    setPasswordChangeMessage(""); // Clear previous messages
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      setPasswordChangeMessage("Vui lòng điền đầy đủ các ô mật khẩu.");
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordChangeMessage("Mật khẩu mới và xác nhận mật khẩu không khớp.");
+      return;
+    }
+
+    if (!/^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{6,}$/.test(newPassword)) {
+      setPasswordChangeMessage(
+        "Mật khẩu mới phải chứa ít nhất một chữ cái, một chữ số, và từ 6 ký tự trở lên."
+      );
+      return;
+    }
+
+    try {
+      const response = await changePassword(
+        currentPassword,
+        newPassword,
+        customer.accessToken,
+        axiosJWT
+      );
+
+      if (response.success) {
+        setPasswordChangeMessage("Đổi mật khẩu thành công.");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+        setTimeout(() => {
+          setPasswordChangeMessage("");
+        }, 2000);
+      } else if (response.error === "Current password is incorrect.") {
+        setPasswordChangeMessage("Mật khẩu hiện tại không chính xác.");
+        setTimeout(() => {
+          setPasswordChangeMessage("");
+        }, 2000);
+      } else if (
+        response.error ===
+        "New password cannot be the same as the current password."
+      ) {
+        setPasswordChangeMessage("Mật khẩu mới không được giống mật khẩu cũ.");
+      } else {
+        setPasswordChangeMessage(
+          response.error || "Đã xảy ra lỗi khi đổi mật khẩu."
+        );
+      }
+    } catch (error) {
+      setPasswordChangeMessage("Đã xảy ra lỗi khi đổi mật khẩu.");
+    }
   };
 
   return (
@@ -94,38 +218,91 @@ const ProfileCustomer = () => {
             <div className="profile-info">
               <h2>Thông Tin Khách Hàng</h2>
               <div className="info-list">
-                {Object.entries(customerInfo).map(([key, value]) => {
-                  if (key === 'passWord' || key === 'userName') return null; // Skip password and username
-
-                  // Get the display label for the field
-                  const label = labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1);
+                {orderedFields.map((key) => {
+                  const value = customerInfo[key];
+                  const label =
+                    labelMapping[key] ||
+                    key.charAt(0).toUpperCase() + key.slice(1);
 
                   return (
                     <div className="info-item" key={key}>
                       <Form.Label>{label}:</Form.Label>
-                      <div>
+                      <div className="info-content">
                         {isEditing === key ? (
                           <>
                             <Form.Control
                               type="text"
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
+                              style={{
+                                width: "300px",
+                              }}
                             />
-                            <Button variant="primary" onClick={handleSaveClick} className="mt-2">Lưu</Button>
-                            <Button variant="secondary" onClick={handleCancelClick} className="mt-2 ms-2">Hủy</Button>
+                            <Button
+                              variant="dark"
+                              onClick={handleSaveClick}
+                              className="mt-2"
+                              style={{
+                                marginBottom: "10px",
+                              }}
+                            >
+                              Lưu
+                            </Button>
+                            <Button
+                              variant="danger"
+                              onClick={handleCancelClick}
+                              className="mt-2 ms-2"
+                              style={{
+                                marginBottom: "10px",
+                              }}
+                            >
+                              Hủy
+                            </Button>
                           </>
                         ) : (
                           <>
-                            <span>{value ? value.toString() : "N/A"}</span>
-                            <Button variant="outline-primary" onClick={() => handleEditClick(key)} className="ms-2">
-                              <img src={edit} alt="Edit" className="edit-icon" />
-                            </Button>
+                            <div className="info-text">
+                              <span className="info-value">
+                                {value ? value.toString() : "N/A"}
+                              </span>
+                              <div className="button-edit">
+                                <Button
+                                  variant="light"
+                                  onClick={() => handleEditClick(key)}
+                                  className="ms-2"
+                                >
+                                  <img
+                                    src={edit}
+                                    alt="Edit"
+                                    className="edit-icon"
+                                  />
+                                </Button>
+                              </div>
+                            </div>
                           </>
                         )}
                       </div>
                     </div>
                   );
                 })}
+                {updateSuccessMessage && (
+                  <div className="mt-3">
+                    <span
+                      className={
+                        updateSuccessMessage.includes("thành công")
+                          ? "text-success"
+                          : "text-danger"
+                      }
+                    >
+                      {updateSuccessMessage}
+                    </span>
+                  </div>
+                )}
+                {updateErrorMessage && (
+                  <div className="mt-3">
+                    <span className="text-danger">{updateErrorMessage}</span>
+                  </div>
+                )}
               </div>
             </div>
           </Col>
@@ -135,17 +312,103 @@ const ProfileCustomer = () => {
               <Form>
                 <Form.Group controlId="currentPassword">
                   <Form.Label>Mật khẩu hiện tại:</Form.Label>
-                  <Form.Control type="password" />
+                  <InputGroup>
+                    <Form.Control
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Mật khẩu hiện tại"
+                      required
+                    />
+                    <InputGroup.Text
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
+                      style={{
+                        cursor: "pointer",
+                        border: "1px solid #ccc",
+                        borderLeft: "none",
+                        backgroundColor: "#fff",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={showCurrentPassword ? faEyeSlash : faEye}
+                      />
+                    </InputGroup.Text>
+                  </InputGroup>
                 </Form.Group>
                 <Form.Group controlId="newPassword" className="mt-3">
                   <Form.Label>Mật khẩu mới:</Form.Label>
-                  <Form.Control type="password" />
+                  <InputGroup>
+                    <Form.Control
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Mật khẩu mới"
+                      required
+                    />
+                    <InputGroup.Text
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      style={{
+                        cursor: "pointer",
+                        border: "1px solid #ccc",
+                        borderLeft: "none",
+                        backgroundColor: "#fff",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={showNewPassword ? faEyeSlash : faEye}
+                      />
+                    </InputGroup.Text>
+                  </InputGroup>
                 </Form.Group>
                 <Form.Group controlId="confirmNewPassword" className="mt-3">
                   <Form.Label>Nhập lại mật khẩu mới:</Form.Label>
-                  <Form.Control type="password" />
+                  <InputGroup>
+                    <Form.Control
+                      type={showConfirmNewPassword ? "text" : "password"}
+                      value={confirmNewPassword}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
+                      placeholder="Nhập lại mật khẩu mới"
+                      required
+                    />
+                    <InputGroup.Text
+                      onClick={() =>
+                        setShowConfirmNewPassword(!showConfirmNewPassword)
+                      }
+                      style={{
+                        cursor: "pointer",
+                        border: "1px solid #ccc",
+                        borderLeft: "none",
+                        backgroundColor: "#fff",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={showConfirmNewPassword ? faEyeSlash : faEye}
+                      />
+                    </InputGroup.Text>
+                  </InputGroup>
                 </Form.Group>
-                <Button variant="primary" className="mt-3">Đổi mật khẩu</Button>
+                {passwordChangeMessage && (
+                  <div className="mt-3">
+                    <span
+                      className={
+                        passwordChangeMessage.includes("thành công")
+                          ? "text-success"
+                          : "text-danger"
+                      }
+                    >
+                      {passwordChangeMessage}
+                    </span>
+                  </div>
+                )}
+                <Button
+                  variant="dark"
+                  className="mt-3"
+                  onClick={handlePasswordChange}
+                >
+                  Đổi mật khẩu
+                </Button>
               </Form>
             </div>
           </Col>
@@ -168,12 +431,14 @@ const ProfileCustomer = () => {
                 cartData.map((order, index) => (
                   <tr key={index}>
                     <td>{order.idDonHang}</td>
-                    <td>{order.ngayDatHang}</td>
+                    <td>{formatDate(order.ngayDatHang)}</td>
                     <td>{order.phuongThucTT}</td>
                     <td>{order.trangThai}</td>
                     <td>{formatPrice(order.tongTienDH)}</td>
                     <td>
-                      <Button variant="dark" className="detail-button">Xem chi tiết đơn hàng</Button>
+                      <Button variant="dark" className="detail-button">
+                        Xem chi tiết đơn hàng
+                      </Button>
                     </td>
                   </tr>
                 ))

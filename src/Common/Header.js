@@ -77,7 +77,7 @@ const handleProfileClick = () => {
       align="end"
     >
       <NavDropdown.Item onClick={handleLogoutClick}>Đăng xuất</NavDropdown.Item>
-      <NavDropdown.Item onClick={handleProfileClick}>Trang cá nhân</NavDropdown.Item>
+      <NavDropdown.Item onClick={handleProfileClick}>Thông tin cá nhân</NavDropdown.Item>
     </NavDropdown>
   );
 

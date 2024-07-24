@@ -1,52 +1,71 @@
 .profile-container {
-    margin-top: 20px;
-  }
-  
-  .profile-info, .password-change {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .info-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .info-item label {
-    flex: 0 0 150px;
-    font-weight: bold;
-  }
-  
-  .info-item span {
-    flex: 1;
-  }
-  
-  .edit-icon {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .password-change form {
-    max-width: 400px;
-  }
-  
-  .profile-orders {
-    margin-top: 40px;
-  }
-  
-  .profile-orders h2 {
-    margin-bottom: 20px;
-  }
-  
-  .detail-button {
-    background-color: #000;
-    color: #fff;
-  }
-  
-  .detail-button:hover {
-    background-color: #444;
-  }
-  
+  margin-top: 20px;
+}
+
+.profile-info, .password-change {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.info-item label {
+  flex: 0 0 150px;
+  font-weight: bold;
+  text-align: left;
+}
+
+.info-content {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-text {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.edit-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.password-change {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 500px; /* Adjust width as needed */
+  margin: 0 auto; /* Center-align the section */
+  text-align: center; /* Center-align text */
+}
+
+.profile-orders {
+  margin-top: 40px;
+}
+
+.profile-orders h2 {
+  margin-bottom: 20px;
+}
+
+.detail-button {
+  background-color: #000;
+  color: #fff;
+}
+
+.detail-button:hover {
+  background-color: #444;
+}
+
+.button-edit {
+  margin-left: auto;
+}

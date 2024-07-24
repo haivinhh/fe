@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Form, Button, Container, Alert } from "react-bootstrap"; // Import Alert từ react-bootstrap
+import { Form, Button, Container, Alert } from "react-bootstrap";
 import Header from "../Common/Header";
 import Footer from "../Common/Footer";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { registerCus } from "../redux/apiRequest";
+import { registerFailed } from "../redux/authSlice"; // Import registerFailed action
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -15,13 +16,15 @@ const Register = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
-  const [validationError, setValidationError] = useState(""); // State để lưu thông báo lỗi validation
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false); // State để hiển thị thông báo thành công
+  const [validationError, setValidationError] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const registerError = useSelector((state) => state.auth.error); // Get error from Redux store
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     // Validate password match
     if (password !== confirmPassword) {
       setValidationError("Mật khẩu xác nhận không khớp");
@@ -31,9 +34,7 @@ const Register = () => {
     // Validate password complexity
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
     if (!passwordPattern.test(password)) {
-      setValidationError(
-        "Mật khẩu phải chứa ít nhất một chữ cái và một chữ số, từ 6 ký tự trở lên"
-      );
+      setValidationError("Mật khẩu phải chứa ít nhất một chữ cái và một chữ số, từ 6 ký tự trở lên");
       return;
     }
 
@@ -42,6 +43,7 @@ const Register = () => {
       setValidationError("Số điện thoại chỉ được chứa các ký tự số");
       return;
     }
+
     // Clear any previous validation errors
     setValidationError("");
 
@@ -55,23 +57,28 @@ const Register = () => {
     };
 
     // Call registerCus function
-    registerCus(newCustomer, dispatch, navigate);
+    const result = await registerCus(newCustomer, dispatch, navigate);
 
-    // Reset form fields after submission (optional)
-    setUsername("");
-    setPassword("");
-    setConfirmPassword("");
-    setFullName("");
-    setPhoneNumber("");
-    setAddress("");
-    setEmail("");
+    if (result.success) {
+      // Reset form fields after submission (optional)
+      setUsername("");
+      setPassword("");
+      setConfirmPassword("");
+      setFullName("");
+      setPhoneNumber("");
+      setAddress("");
+      setEmail("");
 
-    // Show success message
-    setShowSuccessMessage(true);
-    setTimeout(() => {
-      setShowSuccessMessage(false);
-      navigate("/login");
-    }, 2000);
+      // Show success message
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        navigate("/login");
+      }, 2000);
+    } else {
+      // Handle the error
+      setValidationError(result.message);
+    }
   };
 
   return (
@@ -83,6 +90,12 @@ const Register = () => {
         {showSuccessMessage && (
           <Alert variant="success" onClose={() => setShowSuccessMessage(false)} dismissible>
             Đăng ký thành công! Đăng nhập để tiếp tục.
+          </Alert>
+        )}
+
+        {validationError && (
+          <Alert variant="danger" onClose={() => setValidationError("")} dismissible>
+            {validationError}
           </Alert>
         )}
 
@@ -156,12 +169,6 @@ const Register = () => {
               required
             />
           </Form.Group>
-
-          {validationError && (
-            <Alert variant="danger" onClose={() => setValidationError("")} dismissible>
-              {validationError}
-            </Alert>
-          )}
 
           <Button variant="dark" type="submit" className="w-100">
             Đăng ký

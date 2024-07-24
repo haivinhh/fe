@@ -10,7 +10,12 @@ import {
   registerStart,
   registerSuccess,
 } from "./authSlice";
-import { getCartStart, getCartSuccess, getCartFailed, getCartLogout } from "./cartSlice";
+import {
+  getCartStart,
+  getCartSuccess,
+  getCartFailed,
+  getCartLogout,
+} from "./cartSlice";
 
 export const loginUser = async (user, dispatch, navigate) => {
   dispatch(loginStart());
@@ -19,9 +24,16 @@ export const loginUser = async (user, dispatch, navigate) => {
     dispatch(loginSuccess(res.data));
 
     // Create order after successful login
-    const createOrderResult = await createOrder(res.data.accessToken, http, res.data.idUser);
+    const createOrderResult = await createOrder(
+      res.data.accessToken,
+      http,
+      res.data.idUser
+    );
     if (!createOrderResult.success) {
-      console.error("Failed to create order after login:", createOrderResult.error);
+      console.error(
+        "Failed to create order after login:",
+        createOrderResult.error
+      );
     }
 
     return { status: "success" };
@@ -57,12 +69,22 @@ export const registerCus = async (user, dispatch, navigate) => {
   try {
     await http.post("/api/cusregister", user);
     dispatch(registerSuccess());
+    return { success: true }; // Return success status
   } catch (error) {
-    dispatch(registerFailed());
+    const errorMessage =
+      error.response?.data?.message || "Đăng ký thất bại, vui lòng thử lại.";
+    dispatch(registerFailed(errorMessage));
+    return { success: false, message: errorMessage }; // Return error status and message
   }
 };
 
-export const logOutCus = async (dispatch, idUser, navigate, accessToken, axiosJWT) => {
+export const logOutCus = async (
+  dispatch,
+  idUser,
+  navigate,
+  accessToken,
+  axiosJWT
+) => {
   dispatch(logOutStart());
   try {
     await axiosJWT.post("/api/cuslogout", idUser, {
@@ -88,11 +110,21 @@ export const getDetailCart = async (accessToken, dispatch, axiosJWT) => {
   }
 };
 
-export const addToCart = async (idSanPham, soLuong, accessToken, axiosJWT, dispatch) => {
+export const addToCart = async (
+  idSanPham,
+  soLuong,
+  accessToken,
+  axiosJWT,
+  dispatch
+) => {
   try {
-    const response = await axiosJWT.post("/api/cart/add", { idSanPham, soLuong }, {
-      headers: { token: `Bearer ${accessToken}` }
-    });
+    const response = await axiosJWT.post(
+      "/api/cart/add",
+      { idSanPham, soLuong },
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
+    );
 
     if (response.data.success) {
       return { success: true };
@@ -105,16 +137,28 @@ export const addToCart = async (idSanPham, soLuong, accessToken, axiosJWT, dispa
   }
 };
 
-export const updateCartItem = async (idChiTietDH, soLuong, accessToken, axiosJWT) => {
+export const updateCartItem = async (
+  idChiTietDH,
+  soLuong,
+  accessToken,
+  axiosJWT
+) => {
   try {
-    const response = await axiosJWT.put("/api/cart/updatecartitem", { idChiTietDH, soLuong }, {
-      headers: { token: `Bearer ${accessToken}` }
-    });
+    const response = await axiosJWT.put(
+      "/api/cart/updatecartitem",
+      { idChiTietDH, soLuong },
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
+    );
 
     if (response.data.success) {
       return { success: true };
     } else {
-      return { success: false, error: "Cập nhật sản phẩm trong giỏ hàng thất bại" };
+      return {
+        success: false,
+        error: "Cập nhật sản phẩm trong giỏ hàng thất bại",
+      };
     }
   } catch (err) {
     console.error("Lỗi khi cập nhật sản phẩm trong giỏ hàng:", err);
@@ -141,23 +185,20 @@ export const deleteCartItem = async (idChiTietDH, accessToken, axiosJWT) => {
     return { success: false, error: err.response?.data || err.message };
   }
 };
-export const getCusById = async (idUser, accessToken,axiosJWT) => {
+export const getCusById = async (idUser, accessToken, axiosJWT) => {
   try {
     const response = await axiosJWT.get(`/api/getcusbyid`, {
       headers: { token: `Bearer ${accessToken}` },
     });
-    console.log("aad",response.data);
     return response.data;
-    
   } catch (error) {
     console.error("Error fetching customer data:", error);
     throw error;
   }
-  
 };
-export const getCart = async (idUser, accessToken,axiosJWT) => {
+export const getCart = async (idUser, accessToken, axiosJWT) => {
   try {
-    const response = await axiosJWT.get(`/api/cart`,{
+    const response = await axiosJWT.get(`/api/cart`, {
       headers: { token: `Bearer ${accessToken}` },
     });
     return response.data;
@@ -166,3 +207,61 @@ export const getCart = async (idUser, accessToken,axiosJWT) => {
     throw error;
   }
 };
+export const changePassword = async (
+  currentPassword,
+  newPassword,
+  accessToken,
+  axiosJWT
+) => {
+  try {
+    const response = await axiosJWT.post(
+      "/api/changepassword",
+      { currentPassword, newPassword },
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
+    );
+
+    // Extract message from response data
+    const { message } = response.data;
+
+    // Check if the password change was successful
+    if (message === "Password changed successfully.") {
+      return { success: true };
+    } else {
+      return { success: false, error: message };
+    }
+  } catch (err) {
+    console.error("Error changing password:", err);
+    // Handle cases where server error messages are present
+    const errorMessage = err.response?.data?.message || err.message;
+    return { success: false, error: errorMessage };
+  }
+};
+export const updateUser = async (idUser, accessToken, axiosJWT) => {
+  try {
+    const response = await axiosJWT.put(
+      "/api/updateuser",
+      idUser,
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
+    );
+    const { message } = response.data;
+
+    if (message === "Cập nhật thông tin thành công.") {
+      return { success: true, message: "Cập nhật thông tin thành công" };
+    }else if(message ==="Địa chỉ email không hợp lệ")
+      {
+        return { success: false, message: message || "Địa chỉ email không hợp lệ" };
+      } else  {
+      return { success: false, message: message || "Cập nhật thông tin thất bại" };
+    }
+  } catch (err) {
+    return { success: false, error: err.response?.data || err.message };
+  }
+};
+
+
+
+
