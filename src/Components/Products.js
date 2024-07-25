@@ -128,6 +128,8 @@ const Products = () => {
   };
 
   const handleApplyFilters = () => {
+    localStorage.removeItem('searchTerm');
+    localStorage.removeItem('selectedCategoryId');
     fetchFilteredProducts();
   };
 

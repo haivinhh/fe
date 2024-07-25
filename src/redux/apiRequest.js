@@ -45,22 +45,26 @@ export const loginUser = async (user, dispatch, navigate) => {
 
 export const createOrder = async (accessToken, axiosJWT, idUser) => {
   try {
+    // Make API request to create order
     const response = await axiosJWT.post(
       "/api/cart/createorder",
       { idUser },
       {
-        headers: { token: `Bearer ${accessToken}` },
+        headers: {
+          token: `Bearer ${accessToken}`, // Use Authorization header for token
+        },
       }
     );
 
-    if (response.data.success) {
+    // Check if response indicates success
+    if (response.status === 201) {
       return { success: true, cart_id: response.data.cart_id };
     } else {
-      return { success: false, error: "Tạo đơn hàng thất bại" };
+      return { success: false, error: response.data.message || "Tạo đơn hàng thất bại" };
     }
   } catch (err) {
     console.error("Lỗi khi tạo đơn hàng:", err);
-    return { success: false, error: err.response?.data || err.message };
+    return { success: false, error: err.response?.data.message || err.message };
   }
 };
 
@@ -109,6 +113,17 @@ export const getDetailCart = async (accessToken, dispatch, axiosJWT) => {
     dispatch(getCartFailed());
   }
 };
+export const getDetailCartOfUser = async (accessToken, idDonHang, dispatch, axiosJWT) => {
+  dispatch(getCartStart());
+  try {
+    const res = await axiosJWT.get(`/api/getdetailcart/${idDonHang}`, {
+      headers: { token: `Bearer ${accessToken}` },
+    });
+    dispatch(getCartSuccess(res.data));
+  } catch (err) {
+    dispatch(getCartFailed());
+  }
+};
 
 export const addToCart = async (
   idSanPham,
@@ -125,6 +140,7 @@ export const addToCart = async (
         headers: { token: `Bearer ${accessToken}` },
       }
     );
+    
 
     if (response.data.success) {
       return { success: true };
@@ -207,6 +223,7 @@ export const getCart = async (idUser, accessToken, axiosJWT) => {
     throw error;
   }
 };
+
 export const changePassword = async (
   currentPassword,
   newPassword,

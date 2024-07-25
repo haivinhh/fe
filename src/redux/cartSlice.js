@@ -7,7 +7,7 @@ const cartSlice = createSlice({
       allCart: null,
       isFetching: false,
       error: false,
-      
+      selectedOrderId: null, // Thêm thuộc tính selectedOrderId vào initialState
     },
   },
   reducers: {
@@ -28,7 +28,9 @@ const cartSlice = createSlice({
       state.cart.allCart = null;
       state.cart.error = true;
     },
-    
+    setSelectedOrderId: (state, action) => {
+      state.cart.selectedOrderId = action.payload; // Cập nhật selectedOrderId
+    },
   },
 });
 
@@ -37,7 +39,7 @@ export const {
   getCartSuccess,
   getCartFailed,
   getCartLogout,
-  
+  setSelectedOrderId, // Xuất action setSelectedOrderId
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

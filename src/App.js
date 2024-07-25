@@ -7,6 +7,7 @@ import Cart from './Components/Cart';
 import Login from './Components/Login';
 import Register from './Components/Register';
 import ProfileCustomer from './Components/ProfileCus';
+import DetailCart from './Components/DetailCart';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function App() {
@@ -26,7 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profilecustomer" element={<ProfileCustomer />} />
-          
+          <Route path="/getdetailcart/:idDonHang" element={<DetailCart />} />
         </Routes>
       </Router>
     </div>

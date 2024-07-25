@@ -12,7 +12,7 @@ import Form from "react-bootstrap/Form";
 import { useParams } from "react-router-dom";
 import http from "../HTTP/http";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../redux/apiRequest";
+import { addToCart, createOrder } from "../redux/apiRequest";
 import { createAxios } from "../redux/createInstance";
 import { loginSuccess } from "../redux/authSlice";
 
@@ -20,13 +20,13 @@ const DetailProduct = () => {
   const { idSanPham } = useParams();
   const [product, setProduct] = useState({});
   const [count, setCount] = useState(1);
+  const [orderCreated, setOrderCreated] = useState(false);
   const customer = useSelector((state) => state.auth.login?.currentUser);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        
         const response = await http.get(`/api/sanpham/detail/${idSanPham}`);
         setProduct(response.data);
       } catch (error) {
@@ -35,7 +35,7 @@ const DetailProduct = () => {
     };
 
     loadProduct();
-  }, [idSanPham, customer, dispatch]);
+  }, [idSanPham]);
 
   const formatPrice = (price) => {
     if (price) {
@@ -68,10 +68,23 @@ const DetailProduct = () => {
         alert("You need to login to add items to the cart");
         return;
       }
-  
+
+      // Create order if not created yet
+      if (!orderCreated) {
+        const axiosJWT = createAxios(customer, dispatch, loginSuccess);
+        const result = await createOrder(customer.accessToken, axiosJWT, customer.idUser);
+
+        if (result.success) {
+          setOrderCreated(true);
+        } else {
+          console.error("Failed to create order:", result.error);
+          return;
+        }
+      }
+
       const axiosJWT = createAxios(customer, dispatch, loginSuccess);
       const result = await addToCart(idSanPham, count, customer.accessToken, axiosJWT, dispatch);
-  
+
       if (result.success) {
         alert("Added to cart successfully");
       } else {

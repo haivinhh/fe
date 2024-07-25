@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
   Row,
@@ -20,6 +21,7 @@ import {
   getCart,
   changePassword,
   updateUser,
+  getDetailCartOfUser
 } from "../redux/apiRequest";
 import "../CSS/profilecus.css";
 import edit from "../Icon/edit.png";
@@ -39,6 +41,7 @@ const ProfileCustomer = () => {
   const [passwordChangeMessage, setPasswordChangeMessage] = useState("");
   const [updateSuccessMessage, setUpdateSuccessMessage] = useState("");
   const [updateErrorMessage, setUpdateErrorMessage] = useState("");
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const axiosJWT = createAxios(customer, dispatch, loginSuccess);
 
@@ -115,7 +118,22 @@ const ProfileCustomer = () => {
     setIsEditing(field);
     setEditValue(customerInfo[field] || "");
   };
-
+  const handleOrderDetailClick = async (idDonHang) => {
+    try {
+      // Send request to the server with idDonHang
+      const response = await getDetailCartOfUser(idDonHang, customer.accessToken, axiosJWT);
+  
+      if (response.success) {
+        // Navigate to DetailCart component with the idDonHang in the URL
+        navigate(`/getdetailcart/${idDonHang}`);
+      } else {
+        // Handle server errors or response failures
+        console.error("Error fetching order details:", response.message);
+      }
+    } catch (error) {
+      console.error("Error sending order detail request:", error);
+    }
+  };
   const handleSaveClick = async () => {
     if (isEditing) {
       try {
@@ -436,9 +454,13 @@ const ProfileCustomer = () => {
                     <td>{order.trangThai}</td>
                     <td>{formatPrice(order.tongTienDH)}</td>
                     <td>
-                      <Button variant="dark" className="detail-button">
-                        Xem chi tiết đơn hàng
-                      </Button>
+                    <Button 
+    variant="dark" 
+    className="detail-button" 
+    onClick={() => navigate(`/getdetailcart/${order.idDonHang}`)}
+  >
+    Xem chi tiết đơn hàng
+  </Button>
                     </td>
                   </tr>
                 ))

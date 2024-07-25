@@ -67,9 +67,11 @@ const Header = ({ onSearch }) => {
   const handleLoginClick = () => {
     navigate('/login'); // Navigate to login page
   };
-const handleProfileClick = () => {
-  navigate('/profilecustomer');
-}
+
+  const handleProfileClick = () => {
+    navigate('/profilecustomer');
+  };
+
   const userDropdown = (
     <NavDropdown
       title={<Button variant="dark" style={{ marginLeft: '10px' }}><UserOutlined style={{ fontSize: '24px', color: 'white' }} /></Button>}
@@ -85,7 +87,7 @@ const handleProfileClick = () => {
     <>
       <Navbar expand="lg">
         <Container fluid>
-          <Navbar.Brand href="#">
+          <Navbar.Brand as={Link} to="/" style={{ cursor: 'pointer' }}>
             <img
               src={logo}
               style={{ boxShadow: "5px 10px #C0C0C0", margin: "10px", height: "50px" }}
@@ -95,7 +97,7 @@ const handleProfileClick = () => {
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
             <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: "100px" }} navbarScroll>
-              <Nav.Link href="/">Trang chủ</Nav.Link>
+              <Nav.Link as={Link} to="/">Trang chủ</Nav.Link>
               <NavDropdown title="Danh mục sản phẩm" id="navbarScrollingDropdown">
                 {categories.map((value) => (
                   <NavDropdown.Item
