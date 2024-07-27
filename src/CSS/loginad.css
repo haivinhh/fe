@@ -1,0 +1,46 @@
+/* Ensures the entire page takes up the full height of the viewport */
+
+
+/* Container for centering the login form */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 400px; /* Restrict the maximum width of the form */
+    padding: 20px;
+    background: #fff; /* White background for the form */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Styling for the logo */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px; /* Space between logo and form */
+}
+
+.logo {
+    max-width: 100%;
+    height: auto;
+    max-height: 80px; /* Restrict the height of the logo */
+}
+
+/* Style for the login form */
+.login-form {
+    width: 100%; /* Full width form */
+}
+
+/* Style for the form items */
+.login-form .ant-form-item {
+    margin-bottom: 16px; /* Space between form items */
+}
+
+/* Style for the submit button */
+.login-form .ant-btn-primary {
+    width: 100%; /* Full width button */
+    /* Match the border color to the button color */
+    font-size: 16px; /* Font size for button */
+}
