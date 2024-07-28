@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Input, Select, notification, InputNumber } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { loginSuccess, logOutSuccess } from "../../../redux/authSlice";
+import { loginAdminSuccess, logOutAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
 import http from "../../../HTTP/http";
 
@@ -18,8 +18,8 @@ const ProductManager = () => {
   const [editingProduct, setEditingProduct] = useState(null);
 
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.login?.currentUser);
-  const axiosAdmin = createAxiosAdmin(user, loginSuccess, dispatch);
+  const user = useSelector((state) => state.authAdmin.loginAdmin?.currentUser);
+  const axiosAdmin = createAxiosAdmin(user, loginAdminSuccess, dispatch);
 
   useEffect(() => {
     fetchProducts();
@@ -29,7 +29,7 @@ const ProductManager = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await http.get("/api/sanpham");
+      const response = await axiosAdmin.get("/api/sanphamql");
       setProducts(response.data);
     } catch (error) {
       notification.error({
@@ -41,7 +41,7 @@ const ProductManager = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await http.get("/api/danhmucsp");
+      const response = await axiosAdmin.get("/api/danhmucspql");
       setCategories(response.data);
     } catch (error) {
       notification.error({
@@ -53,7 +53,7 @@ const ProductManager = () => {
 
   const fetchPhoneLines = async () => {
     try {
-      const response = await http.get("/api/dongdt");
+      const response = await axiosAdmin.get("/api/dongdtql");
       setPhoneLines(response.data);
     } catch (error) {
       notification.error({

@@ -2,7 +2,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import http from "../HTTP/http";
 import { useNavigate } from 'react-router-dom';
-import { logOutSuccess} from "../redux/authSlice";
+import { logOutAdminSuccess} from "../redux/authSliceAdmin";
 
 const refreshTokenCus = async () => {
     try {
@@ -59,21 +59,29 @@ export const createAxiosAdmin = (currentUser, stateSuccess, dispatch) => {
 
       // Check if the access token is expired
       if (decodedToken.exp < date.getTime() / 1000) {
-        try {
-          const data = await refreshToken();
-          const refreshedUser = {
-            ...currentUser,
-            accessToken: data.accessToken,
-          };
-          dispatch(stateSuccess(refreshedUser));
-          config.headers["token"] = "Bearer " + data.accessToken;
-        } catch (error) {
-          dispatch(logOutSuccess());
-          console.log("out r")
-          return Promise.reject(error); // Exit the request chain
-        }
+        // If token is expired, logout
+        dispatch(logOutAdminSuccess());
+        return Promise.reject(new Error("Token expired, logging out"));
       } else {
-        config.headers["token"] = "Bearer " + currentUser.accessToken;
+        // If token is still valid but close to expiring, refresh it
+        const tokenExpiresIn = decodedToken.exp - date.getTime() / 1000;
+        const refreshThreshold = tokenExpiresIn / 2; 
+        if (tokenExpiresIn < refreshThreshold) {
+          try {
+            const data = await refreshToken();
+            const refreshedUser = {
+              ...currentUser,
+              accessToken: data.accessToken,
+            };
+            dispatch(stateSuccess(refreshedUser));
+            config.headers["token"] = "Bearer " + data.accessToken;
+          } catch (error) {
+            dispatch(logOutAdminSuccess());
+            return Promise.reject(error); // Exit the request chain
+          }
+        } else {
+          config.headers["token"] = "Bearer " + currentUser.accessToken;
+        }
       }
       return config;
     },
@@ -86,32 +94,11 @@ export const createAxiosAdmin = (currentUser, stateSuccess, dispatch) => {
     (response) => response,
     (error) => {
       if (error.response && error.response.status === 403) {
-        dispatch(logOutSuccess());
-        console.log("out r")
+        dispatch(logOutAdminSuccess());
       }
       return Promise.reject(error);
     }
   );
 
   return newInstance;
-};
-export const checkRefreshToken = async (currentUser, dispatch, navigate,stateSuccess) => {
-  const decodedToken = jwtDecode(currentUser?.accessToken);
-  const date = new Date();
-
-  if (decodedToken.exp < date.getTime() / 1000) {
-    try {
-      const data = await refreshToken();
-      const refreshedUser = {
-        ...currentUser,
-        accessToken: data.accessToken,
-      };
-      dispatch(stateSuccess(refreshedUser));
-    } catch (error) {
-      dispatch(logOutSuccess());
-      navigate("/admin");
-      return false;
-    }
-  }
-  return true;
 };

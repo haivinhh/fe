@@ -1,0 +1,21 @@
+.order-details-container {
+    text-align: left;
+  }
+  
+  .order-details-container p {
+    margin: 8px 0;
+  }
+  
+  .order-details-table {
+    margin-top: 16px;
+  }
+  
+  .order-details-table .ant-table-cell {
+    text-align: left;
+  }
+  
+  .order-details-table img {
+    width: 100px;
+    height: auto;
+  }
+  

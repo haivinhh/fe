@@ -279,6 +279,62 @@ export const updateUser = async (idUser, accessToken, axiosJWT) => {
   }
 };
 
+export const getCustomerAddress = async (accessToken, axiosJWT) => {
+  try {
+    const response = await axiosJWT.get("/api/address", {
+      headers: { token: `Bearer ${accessToken}` },
+    });
+    return { success: true, address: response.data };
+  } catch (error) {
+    console.error("Error fetching customer address:", error);
+    return { success: false, error: error.response?.data || error.message };
+  }
+};
 
 
+export const updateCustomerAddress = async (newAddress, accessToken, axiosJWT) => {
+  try {
+    const response = await axiosJWT.put(
+      "/api/address",
+      { newAddress },
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
+    );
 
+    const { message } = response.data;
+
+    if (message === "Address updated successfully.") {
+      return { success: true, message: "Address updated successfully" };
+    } else {
+      return { success: false, message: message || "Failed to update address" };
+    }
+  } catch (error) {
+    console.error("Error updating customer address:", error);
+    return { success: false, error: error.response?.data || error.message };
+  }
+};
+export const payCOD = async (idDonHang, accessToken, axiosJWT) => {
+  try {
+    if (!axiosJWT) {
+      throw new Error('Axios instance is not defined');
+    }
+
+    const response = await axiosJWT.post(
+      "/api/paycod",
+      { idDonHang },
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
+    );
+
+    if (response.status === 200) {
+      return { success: true, message: response.data.message };
+    } else {
+      return { success: false, message: response.data.message || "Failed to process payment" };
+    }
+  } catch (err) {
+    console.error("Error processing COD payment:", err);
+    return { success: false, message: err.response?.data.message || err.message };
+  }
+};

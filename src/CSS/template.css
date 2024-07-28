@@ -1,45 +1,45 @@
 html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
+
 #root {
-    height: 100%;
+  height: 100%;
 }
+
 .sider-custom {
-    background: #02101d; /* Default Sider color */
-    height: 100vh; /* Full height for Sider */
+  background: #02101d; /* Default Sider color */
+  height: 182vh; /* Full height for Sider */
   position: fixed;
   left: 0;
   top: 0;
   overflow: auto; /* Full height of the viewport */
 }
+
 .header-custom {
-    display: flex;
-    align-items: center;
-    background-color: #01172bde; /* Blue background strip */
-    padding-left: 16px;
+  display: flex;
+  align-items: center;
+  background-color: #01172bde; /* Blue background strip */
+  padding-left: 16px;
+  padding-right: 16px;
 }
+
 .logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
 }
+
 .logo {
-    max-width: 100%;
-    height: 30px;
+  max-width: 100%;
+  height: 30px;
 }
-/* template.css */
 
 .layout-container {
   display: flex;
   height: 100vh;
-}
-
-.sider-custom {
-  height: 179vh; /* Đảm bảo Sider chiếm toàn bộ chiều cao */
-  overflow: auto; /* Thêm cuộn nếu cần */
 }
 
 .header-custom {
@@ -61,6 +61,7 @@ html, body {
   max-width: 100%;
   height: auto;
 }
+
 .ant-dropdown-menu a {
   text-decoration: none; /* Remove underline */
 }

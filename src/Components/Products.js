@@ -50,7 +50,7 @@ const Products = () => {
       const brandsResponse = await http.get("/api/dongdt");
       setBrands(brandsResponse.data);
 
-      const phoneTypesResponse = await http.get("/api/loaiDT");
+      const phoneTypesResponse = await http.get("/api/loaidt");
       setPhoneTypes(phoneTypesResponse.data);
 
       const productLinesResponse = await http.get("/api/danhmucsp");

@@ -5,6 +5,7 @@ import {
   GroupOutlined,
   UserOutlined,
   ProductOutlined,
+  ShoppingOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, theme, Dropdown, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -13,29 +14,34 @@ import logo from '../../Icon/logo.jpg'; // Import your logo image
 import '../../CSS/template.css'; // Import your CSS file
 import ProductManager from './Controller/ProductManager'; // Import ProductManager component
 import { logOut } from '../../redux/APIAdmin/APIAdmin'; // Import your logOut function
-import { createAxiosAdmin, checkRefreshToken } from "../../redux/createInstance"; // Import the createAxiosAdmin and checkRefreshToken functions
-import { logOutSuccess } from "../../redux/authSlice";
+import { createAxiosAdmin} from "../../redux/createInstance"; // Import the createAxiosAdmin and checkRefreshToken functions
+import { logOutAdminSuccess } from "../../redux/authSliceAdmin";
+import CateManager from './Controller/CateManager';
+import PhoneTypeManager from './Controller/PhoneTypeManager';
+import PhoneModelManager from './Controller/PhoneModelManager';
+import ShipManager from './Controller/ShipManager';
+import OrderManager from './Controller/OrderManager';
 
 const { Header, Sider, Content } = Layout;
 
 const Template = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState('1'); // Track the selected menu item
-  const user = useSelector((state) => state.auth.login?.currentUser);
+  const user = useSelector((state) => state.authAdmin.loginAdmin?.currentUser);
   const idNhanVien = user?.idNhanVien;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const accessToken = user?.accessToken; // Get accessToken from Redux store
 
   // Create Axios instance for admin
-  let axiosAdmin = createAxiosAdmin(user, logOutSuccess, dispatch);
+  let axiosAdmin = createAxiosAdmin(user, logOutAdminSuccess, dispatch);
 
   // Handler for logout
   const handleLogout = async () => {
     try {
       await logOut(dispatch, idNhanVien, navigate, accessToken, axiosAdmin);
       message.success('Logged out successfully');
-      dispatch(logOutSuccess());
+      dispatch(logOutAdminSuccess());
       navigate("/admin");
     } catch (error) {
       message.error('Logout failed');
@@ -47,12 +53,9 @@ const Template = () => {
   } = theme.useToken();
 
   const handleMenuClick = async (key) => {
-    const tokenValid = await checkRefreshToken(user, dispatch, navigate);
-    if (tokenValid) {
+    
       setSelectedMenu(key);
-    } else {
-      handleLogout();
-    }
+   
   };
 
   // Dropdown menu items
@@ -69,7 +72,8 @@ const Template = () => {
 
   return (
     <Layout> {/* Ensure Layout takes full height */}
-      <Sider trigger={null} collapsible collapsed={collapsed} className="sider-custom">
+      <Sider trigger={null} collapsible collapsed={collapsed} className="sider-custom"
+      width={270}>
         {!collapsed && (
           <div className="logo-container">
             <img src={logo} alt="Logo" className="logo" />
@@ -85,48 +89,85 @@ const Template = () => {
               icon: <ProductOutlined />,
               label: "Quản lí sản phẩm",
               onClick: () => handleMenuClick("1"),
+              style:{textAlign: "left"}
             },
             {
               key: "2",
               icon: <GroupOutlined />,
               label: "Quản lí danh mục sản phẩm",
               onClick: () => handleMenuClick("2"),
+              style:{textAlign: "left"}
             },
             {
               key: "3",
               icon: <GroupOutlined />,
               label: "Quản lí dòng điện thoại",
               onClick: () => handleMenuClick("3"),
+              style:{textAlign: "left"}
             },
             {
               key: "4",
-              icon: <UserOutlined />,
-              label: "Quản lí nhân viên",
+              icon: <GroupOutlined />,
+              label: "Quản lí loại điện thoại",
               onClick: () => handleMenuClick("4"),
+              style:{textAlign: "left"}
             },
             {
               key: "5",
               icon: <UserOutlined />,
-              label: "Quản lí khách hàng",
+              label: "Quản lí nhân viên",
               onClick: () => handleMenuClick("5"),
+              style:{textAlign: "left"}
             },
             {
               key: "6",
               icon: <UserOutlined />,
-              label: "Quản lí đơn vị vận chuyển",
+              label: "Quản lí khách hàng",
               onClick: () => handleMenuClick("6"),
+              style:{textAlign: "left"}
             },
             {
               key: "7",
               icon: <UserOutlined />,
-              label: "Quản lí đơn hàng",
+              label: "Quản lí đơn vị vận chuyển",
               onClick: () => handleMenuClick("7"),
+              style:{textAlign: "left"}
             },
             {
               key: "8",
+              icon: <ShoppingOutlined />,
+              label: "Quản lí đơn hàng",
+              onClick: () => handleMenuClick("8"),
+              style:{textAlign: "left"}
+            },
+            {
+              key: "9",
+              icon: <ShoppingOutlined />,
+              label: "Quản lí đơn hàng chờ xác nhận",
+              onClick: () => handleMenuClick("9"),
+              style:{textAlign: "left"}
+            },
+            {
+              key: "10",
+              icon: <ShoppingOutlined />,
+              label: "Quản lí đơn hàng đang giao",
+              onClick: () => handleMenuClick("10"),
+              style:{textAlign: "left"}
+            },
+            {
+              key: "11",
+              icon: <ShoppingOutlined />,
+              label: "Quản lí đơn hàng đã giao",
+              onClick: () => handleMenuClick("11"),
+              style:{textAlign: "left"}
+            },
+
+            {
+              key: "12",
               icon: <UserOutlined />,
               label: "Quản lí khuyến mãi",
-              onClick: () => handleMenuClick("8"),
+              onClick: () => handleMenuClick("12"),
+              style:{textAlign: "left"}
             },
           ]}
         />
@@ -172,7 +213,13 @@ const Template = () => {
             borderRadius: borderRadiusLG,
           }}
         >
-          {selectedMenu === '1' && <ProductManager />} {/* Conditionally render ProductManager */}
+          {selectedMenu === '1' && <ProductManager />} 
+          {selectedMenu === '2' && <CateManager />}
+          {selectedMenu === '3' && <PhoneModelManager />}
+          {selectedMenu === '4' && <PhoneTypeManager />}
+          {selectedMenu === '7' && <ShipManager />}
+          {selectedMenu === '8' && <OrderManager />}
+
         </Content>
       </Layout>
     </Layout>
