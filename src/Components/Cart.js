@@ -2,22 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../Common/Header";
 import Footer from "../Common/Footer";
-import { getDetailCart, deleteCartItem, updateCartItem, getCustomerAddress, updateCustomerAddress, payCOD } from "../redux/apiRequest";
+import { getDetailCart, deleteCartItem, updateCartItem, payCOD } from "../redux/apiRequest";
 import { loginSuccess } from "../redux/authSlice";
 import { createAxios } from "../redux/createInstance";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
+import { Button, Modal, Table, Typography, Input, Space } from "antd";
 import "../CSS/cart.css";
+
+const { Title, Text } = Typography;
 
 const Cart = () => {
   const customer = useSelector((state) => state.auth.login?.currentUser);
   const cartData = useSelector((state) => state.cart.cart.allCart);
   const dispatch = useDispatch();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showAddressModal, setShowAddressModal] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("COD"); // Default payment method
-  const [address, setAddress] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("COD");
   const [idDonHang, setIdDonHang] = useState(null);
 
   useEffect(() => {
@@ -36,24 +35,7 @@ const Cart = () => {
       }
     };
 
-    const fetchAddress = async () => {
-      if (customer?.accessToken) {
-        try {
-          const result = await getCustomerAddress(customer.accessToken, axiosJWT);
-          if (result?.address) {
-            setAddress(result.address);
-          } else {
-            setAddress("Chưa có địa chỉ");
-          }
-        } catch (error) {
-          console.error("Failed to fetch customer address:", error);
-          setAddress("Chưa có địa chỉ");
-        }
-      }
-    };
-
     fetchCart();
-    fetchAddress();
   }, [customer, dispatch]);
 
   useEffect(() => {
@@ -94,7 +76,6 @@ const Cart = () => {
 
   const handleCloseModal = () => {
     setShowConfirmModal(false);
-    setShowAddressModal(false);
   };
 
   const handleQuantityChange = async (idChiTietDH, newQuantity) => {
@@ -127,7 +108,6 @@ const Cart = () => {
         const result = await payCOD(idDonHang, customer.accessToken, axiosJWT);
         if (result.success) {
           alert("Thanh toán thành công!");
-          
         } else {
           alert(`Thanh toán thất bại: ${result.message}`);
         }
@@ -140,124 +120,127 @@ const Cart = () => {
     }
   };
 
-  const handleAddressUpdate = async () => {
-    if (!address.trim()) {
-      alert("Địa chỉ không được để trống.");
-      return;
-    }
-
-    const axiosJWT = createAxios(customer, dispatch, loginSuccess);
-    try {
-      const result = await updateCustomerAddress(address, customer.accessToken, axiosJWT);
-      if (result.success) {
-        alert("Địa chỉ đã được cập nhật thành công.");
-        await getCustomerAddress(customer.accessToken, dispatch, axiosJWT);
-        handleCloseModal();
-      } else {
-        alert(`Cập nhật địa chỉ thất bại: ${result.error}`);
-      }
-    } catch (error) {
-      console.error("Lỗi khi cập nhật địa chỉ:", error);
-      alert("Cập nhật địa chỉ thất bại. Vui lòng thử lại sau.");
-    }
-  };
+  const columns = [
+    {
+      title: 'Hình ảnh',
+      dataIndex: 'hinhSP',
+      key: 'hinhSP',
+      render: (text, record) => (
+        <img src={record.hinhSP} alt={record.tenSanPham} style={{ width: '100px', height: '100px', borderRadius: '5px' }} />
+      ),
+    },
+    {
+      title: 'Tên sản phẩm',
+      dataIndex: 'tenSanPham',
+      key: 'tenSanPham',
+    },
+    {
+      title: 'Đơn giá',
+      dataIndex: 'donGia',
+      key: 'donGia',
+      render: (text) => formatPrice(text),
+    },
+    {
+      title: 'Số lượng',
+      dataIndex: 'soLuong',
+      key: 'soLuong',
+      render: (text, record) => (
+        <Space>
+          <Button
+            style={{ backgroundColor: '#000', color: '#fff' }}
+            onClick={() => handleQuantityChange(record.idChiTietDH, record.soLuong - 1)}
+          >
+            -
+          </Button>
+          <Input
+            type="number"
+            value={record.soLuong}
+            onChange={(e) => handleQuantityChange(record.idChiTietDH, parseInt(e.target.value))}
+            style={{ width: '60px', textAlign: 'center' }}
+          />
+          <Button
+            style={{ backgroundColor: '#000', color: '#fff' }}
+            onClick={() => handleQuantityChange(record.idChiTietDH, record.soLuong + 1)}
+          >
+            +
+          </Button>
+        </Space>
+      ),
+    },
+    {
+      title: 'Thành tiền',
+      dataIndex: 'tongTien',
+      key: 'tongTien',
+      render: (text) => formatPrice(text),
+    },
+    {
+      title: 'Thao tác',
+      key: 'action',
+      render: (_, record) => (
+        <Button
+          type="default"
+          danger
+          style={{ backgroundColor: '#ff4d4f', color: '#fff' }}
+          onClick={() => handleDeleteCartItem(record.idChiTietDH)}
+        >
+          Xóa
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <>
       <Header />
       <div className="cart-container">
-        <h2>Giỏ Hàng</h2>
+        <Title level={2}>Giỏ Hàng</Title>
         {cartData && cartData.length === 0 ? (
-          <p>Giỏ hàng của bạn đang trống.</p>
+          <Text>Giỏ hàng của bạn đang trống.</Text>
         ) : (
-          <div className="cart-list-container">
-            <ul className="cart-list">
-              {cartData &&
-                cartData.map((item) => (
-                  <li key={item.idSanPham} className="cart-item">
-                    <img src={item.hinhSP} alt={item.tenSanPham} className="cart-item-image" />
-                    <div className="cart-item-details">
-                      <h3>{item.tenSanPham}</h3>
-                      <p>Đơn giá: {formatPrice(item.donGia)}</p>
-                    </div>
-                    <div className="cart-item-quantity">
-                      <Button variant="dark" onClick={() => handleQuantityChange(item.idChiTietDH, item.soLuong - 1)}>-</Button>
-                      <input
-                        type="number"
-                        className="quantity-input"
-                        value={item.soLuong}
-                        onChange={(e) => handleQuantityChange(item.idChiTietDH, parseInt(e.target.value))}
-                      />
-                      <Button variant="dark" onClick={() => handleQuantityChange(item.idChiTietDH, item.soLuong + 1)}>+</Button>
-                    </div>
-                    <p>Thành tiền: {formatPrice(item.tongTien)}</p>
-                    <Button
-                      variant="dark"
-                      onClick={() => handleDeleteCartItem(item.idChiTietDH)}
-                      className="delete-button"
-                    >
-                      Xóa
-                    </Button>
-                  </li>
-                ))}
-            </ul>
+          <div className="cart-table-container">
+            <Table
+              columns={columns}
+              dataSource={cartData}
+              rowKey="idChiTietDH"
+              pagination={false}
+            />
             <div className="cart-summary">
               {cartData && cartData.length > 0 && (
-                <p>Tổng Tiền Đơn Hàng: {formatPrice(cartData.reduce((acc, item) => acc + item.tongTien, 0))}</p>
+                <Text strong>Tổng Tiền Đơn Hàng: {formatPrice(cartData.reduce((acc, item) => acc + item.tongTien, 0))}</Text>
               )}
-              <div className="address-section">
-                <h3>Địa Chỉ</h3>
-                <p>{typeof address === 'string' ? address : "Chưa có địa chỉ"}</p>
-                <Button variant="primary" onClick={() => setShowAddressModal(true)}>Đổi Địa Chỉ</Button>
-              </div>
               <div className="payment-options">
-                <h3>Phương Thức Thanh Toán</h3>
+                <Title level={3}>Phương Thức Thanh Toán</Title>
                 <Button
-                  variant="dark"
+                  style={{ backgroundColor: paymentMethod === "COD" ? '#000' : '#f0f0f0', color: paymentMethod === "COD" ? '#fff' : '#000' }}
                   onClick={() => setPaymentMethod("COD")}
-                  active={paymentMethod === "COD"}
                 >
                   Thanh toán khi nhận hàng
                 </Button>
                 {/* Add other payment methods here if needed */}
               </div>
-              <Button variant="dark" onClick={handlePayment}>Thanh Toán</Button>
+              <Button
+                style={{ backgroundColor: '#000', color: '#fff', marginTop: '10px' }}
+                onClick={handlePayment}
+              >
+                Thanh Toán
+              </Button>
             </div>
           </div>
         )}
       </div>
+
+      <Modal
+        title="Xác Nhận Xóa"
+        open={showConfirmModal}
+        onOk={confirmDelete}
+        onCancel={handleCloseModal}
+        okText="Xóa"
+        cancelText="Hủy"
+      >
+        <p>Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng không?</p>
+      </Modal>
+
       <Footer />
-
-      {/* Confirm Delete Modal */}
-      <Modal show={showConfirmModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Xác Nhận</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Bạn có chắc chắn muốn xóa sản phẩm khỏi giỏ hàng không?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>Hủy</Button>
-          <Button variant="danger" onClick={confirmDelete}>Xóa</Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* Address Update Modal */}
-      <Modal show={showAddressModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Cập Nhật Địa Chỉ</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <input
-            type="text"
-            className="form-control"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>Hủy</Button>
-          <Button variant="primary" onClick={handleAddressUpdate}>Cập Nhật</Button>
-        </Modal.Footer>
-      </Modal>
     </>
   );
 };

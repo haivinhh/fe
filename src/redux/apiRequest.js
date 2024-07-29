@@ -22,20 +22,6 @@ export const loginUser = async (user, dispatch, navigate) => {
   try {
     const res = await http.post("/api/cuslogin", user);
     dispatch(loginSuccess(res.data));
-
-    // Create order after successful login
-    const createOrderResult = await createOrder(
-      res.data.accessToken,
-      http,
-      res.data.idUser
-    );
-    if (!createOrderResult.success) {
-      console.error(
-        "Failed to create order after login:",
-        createOrderResult.error
-      );
-    }
-
     return { status: "success" };
   } catch (err) {
     dispatch(loginFailed());
@@ -43,30 +29,7 @@ export const loginUser = async (user, dispatch, navigate) => {
   }
 };
 
-export const createOrder = async (accessToken, axiosJWT, idUser) => {
-  try {
-    // Make API request to create order
-    const response = await axiosJWT.post(
-      "/api/cart/createorder",
-      { idUser },
-      {
-        headers: {
-          token: `Bearer ${accessToken}`, // Use Authorization header for token
-        },
-      }
-    );
 
-    // Check if response indicates success
-    if (response.status === 201) {
-      return { success: true, cart_id: response.data.cart_id };
-    } else {
-      return { success: false, error: response.data.message || "Tạo đơn hàng thất bại" };
-    }
-  } catch (err) {
-    console.error("Lỗi khi tạo đơn hàng:", err);
-    return { success: false, error: err.response?.data.message || err.message };
-  }
-};
 
 export const registerCus = async (user, dispatch, navigate) => {
   dispatch(registerStart());
@@ -124,14 +87,7 @@ export const getDetailCartOfUser = async (accessToken, idDonHang, dispatch, axio
     dispatch(getCartFailed());
   }
 };
-
-export const addToCart = async (
-  idSanPham,
-  soLuong,
-  accessToken,
-  axiosJWT,
-  dispatch
-) => {
+export const createOrUpdateCart = async (idSanPham, soLuong, accessToken, axiosJWT) => {
   try {
     const response = await axiosJWT.post(
       "/api/cart/add",
@@ -140,16 +96,15 @@ export const addToCart = async (
         headers: { token: `Bearer ${accessToken}` },
       }
     );
-    
 
     if (response.data.success) {
-      return { success: true };
+      return { success: true, message: response.data.message };
     } else {
-      return { success: false, error: "Failed to add to cart" };
+      return { success: false, error: response.data.message || "Failed to add or update cart item" };
     }
   } catch (err) {
-    console.error("Error adding to cart:", err);
-    return { success: false, error: err.response?.data || err.message };
+    console.error("Error adding or updating cart item:", err);
+    return { success: false, error: err.response?.data?.message || err.message };
   }
 };
 

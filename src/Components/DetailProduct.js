@@ -12,7 +12,7 @@ import Form from "react-bootstrap/Form";
 import { useParams } from "react-router-dom";
 import http from "../HTTP/http";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, createOrder } from "../redux/apiRequest";
+import { createOrUpdateCart } from "../redux/apiRequest"; // Import the function
 import { createAxios } from "../redux/createInstance";
 import { loginSuccess } from "../redux/authSlice";
 
@@ -20,7 +20,6 @@ const DetailProduct = () => {
   const { idSanPham } = useParams();
   const [product, setProduct] = useState({});
   const [count, setCount] = useState(1);
-  const [orderCreated, setOrderCreated] = useState(false);
   const customer = useSelector((state) => state.auth.login?.currentUser);
   const dispatch = useDispatch();
 
@@ -64,26 +63,8 @@ const DetailProduct = () => {
 
   const handleAddToCart = async () => {
     try {
-      if (!customer?.accessToken) {
-        alert("You need to login to add items to the cart");
-        return;
-      }
-
-      // Create order if not created yet
-      if (!orderCreated) {
-        const axiosJWT = createAxios(customer, dispatch, loginSuccess);
-        const result = await createOrder(customer.accessToken, axiosJWT, customer.idUser);
-
-        if (result.success) {
-          setOrderCreated(true);
-        } else {
-          console.error("Failed to create order:", result.error);
-          return;
-        }
-      }
-
       const axiosJWT = createAxios(customer, dispatch, loginSuccess);
-      const result = await addToCart(idSanPham, count, customer.accessToken, axiosJWT, dispatch);
+      const result = await createOrUpdateCart(idSanPham, count, customer.accessToken, axiosJWT);
 
       if (result.success) {
         alert("Added to cart successfully");
@@ -167,8 +148,8 @@ const DetailProduct = () => {
               <ListGroup.Item>
                 <Col md="auto" style={{ marginRight: "10px" }}>
                   <Button
-                    variant="dark" // Change to dark variant
-                    style={{ height: "51px" }} // Remove boxShadow and other styles to make it a standard dark button
+                    variant="dark"
+                    style={{ height: "51px" }}
                     onClick={handleAddToCart}
                   >
                     <b>Thêm vào giỏ hàng</b>
