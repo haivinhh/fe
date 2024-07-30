@@ -18,6 +18,7 @@ const OrderConfirmManager = () => {
   const [shippingOptions, setShippingOptions] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [viewingDetails, setViewingDetails] = useState(false);
+  const [loadingOrderId, setLoadingOrderId] = useState(null); // State for managing loading
 
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authAdmin.loginAdmin?.currentUser);
@@ -53,6 +54,8 @@ const OrderConfirmManager = () => {
   };
 
   const handleConfirmOrder = async (idDonHang, idDonViVanChuyen) => {
+    setLoadingOrderId(idDonHang); // Set loading state for the button
+
     try {
       await axiosAdmin.post("/api/confirmorder", {
         idDonHang,
@@ -67,6 +70,8 @@ const OrderConfirmManager = () => {
         message: "Error",
         description: "Failed to confirm the order.",
       });
+    } finally {
+      setLoadingOrderId(null); // Revert loading state after request completes
     }
   };
 
@@ -175,6 +180,7 @@ const OrderConfirmManager = () => {
             )
           }
           type="primary"
+          loading={loadingOrderId === record.idDonHang} // Show loading state for this specific order
         >
           Xác Nhận
         </Button>
@@ -200,6 +206,7 @@ const OrderConfirmManager = () => {
         return {};
     }
   };
+
   const getStatusText = (status) => {
     switch (status) {
       case "waiting":
@@ -269,20 +276,19 @@ const OrderConfirmManager = () => {
                 </p>
               </div>
               <div className="order-details-right">
+                <Title level={4}>Danh Sách Sản Phẩm</Title>
                 <Table
                   columns={[
                     {
-                      title: "Sản Phẩm",
-                      dataIndex: "tenSanPham",
-                      key: "tenSanPham",
+                      title: "Tên Sản Phẩm",
+                      dataIndex: "tenSP",
+                      key: "tenSP",
                     },
                     {
-                      title: "Hình Sản Phẩm",
-                      dataIndex: "hinhSP",
-                      key: "hinhSP",
-                      render: (hinhSP) => <img src={hinhSP} alt="Product" />,
+                      title: "Số Lượng",
+                      dataIndex: "soLuong",
+                      key: "soLuong",
                     },
-                    { title: "Số Lượng", dataIndex: "soLuong", key: "soLuong" },
                     {
                       title: "Đơn Giá",
                       dataIndex: "donGia",
@@ -290,35 +296,27 @@ const OrderConfirmManager = () => {
                       render: (text) => formatPrice(text),
                     },
                     {
-                      title: "Thành Tiền",
+                      title: "Tổng Tiền",
                       dataIndex: "tongTien",
                       key: "tongTien",
                       render: (text) => formatPrice(text),
                     },
                   ]}
-                  dataSource={selectedOrder.details || []} // Ensure this matches your data structure
-                  rowKey="idChiTietDH"
+                  dataSource={selectedOrder.sanPham || []}
                   pagination={false}
-                  className="order-details-table"
                 />
               </div>
             </div>
           ) : (
-            <Typography.Text>Loading...</Typography.Text>
+            <p>Không có chi tiết đơn hàng.</p>
           )}
         </div>
       ) : (
-        <>
-          <Title level={2} style={{ marginBottom: 16 }}>
-            Quản lí đơn hàng chờ xác nhận
-          </Title>
-          <Table
-            columns={columns}
-            dataSource={orders}
-            rowKey="idDonHang"
-            pagination={false}
-          />
-        </>
+        <Table
+          columns={columns}
+          dataSource={orders}
+          rowKey="idDonHang"
+        />
       )}
     </div>
   );

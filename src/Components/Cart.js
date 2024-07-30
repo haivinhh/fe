@@ -118,8 +118,16 @@ const Cart = () => {
 
   const handleQuantityChange = async (idChiTietDH, newQuantity) => {
     const axiosJWT = createAxios(customer, dispatch, loginSuccess);
-    if (newQuantity < 1) return;
-
+    
+    // Validate quantity
+    if (newQuantity < 1) {
+      notification.error({
+        message: "Cập nhật số lượng thất bại",
+        description: "Số lượng sản phẩm không thể nhỏ hơn 1.",
+      });
+      return;
+    }
+  
     try {
       const result = await updateCartItem(
         idChiTietDH,
@@ -130,23 +138,24 @@ const Cart = () => {
       if (result.success) {
         notification.success({
           message: "Cập nhật số lượng thành công",
+          
         });
         await getDetailCart(customer.accessToken, dispatch, axiosJWT);
       } else {
         notification.error({
           message: "Cập nhật số lượng thất bại",
-          description: `Lỗi: ${result.error}`,
+          description: `Lỗi: ${result.message || 'Số lượng trong kho không đủ'}`,
         });
       }
     } catch (error) {
       console.error("Lỗi khi cập nhật số lượng sản phẩm:", error);
       notification.error({
         message: "Cập nhật số lượng thất bại",
-        description: "Vui lòng thử lại sau.",
+        description: "Vui lòng thử lại sau hoặc liên hệ với hỗ trợ nếu lỗi vẫn tiếp diễn.",
       });
     }
   };
-
+  
   const handlePayment = async () => {
     // Check if the necessary information is provided
     if (!idDonHang) {
