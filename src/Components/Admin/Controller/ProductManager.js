@@ -155,7 +155,9 @@ const ProductManager = () => {
     const phoneLine = phoneLines.find(line => line.idDongDT === id);
     return phoneLine ? phoneLine.tenDongDT : '';
   };
-
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  };
   const columns = [
     {
       title: "Tên sản phẩm",
@@ -166,6 +168,7 @@ const ProductManager = () => {
       title: "Giá",
       dataIndex: "donGia",
       key: "donGia",
+      render: (text) => formatPrice(text),
     },
     {
       title: "Thông tin",

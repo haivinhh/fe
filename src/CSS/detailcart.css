@@ -1,0 +1,37 @@
+/* CSS file: detailCart.css */
+.cart-container {
+    width: 80%;
+    margin: 0 auto;
+  }
+  
+  .cart-table-container {
+    margin-top: 20px;
+  }
+  
+  .cart-table-container .ant-table {
+    margin-top: 20px;
+  }
+  
+  .cart-table-container .ant-table-tbody > tr > td {
+    text-align: left; /* Align all table cells to the left */
+  }
+  
+  .cart-table-container .ant-table-tbody > tr > td:first-child {
+    text-align: left; /* Align image column to the left */
+  }
+  
+  .cart-table-container .ant-table-summary {
+    text-align: left; /* Align summary content to the left */
+  }
+  
+  .cart-table-container .ant-table-summary .ant-table-summary-cell {
+    text-align: left; /* Align summary cell text to the left */
+  }
+  
+  /* Specific column alignment */
+  .cart-table-container .ant-table-tbody > tr > td:nth-child(3),
+  .cart-table-container .ant-table-tbody > tr > td:nth-child(4),
+  .cart-table-container .ant-table-tbody > tr > td:nth-child(5) {
+    text-align: left; /* Align specific columns to the left */
+  }
+  

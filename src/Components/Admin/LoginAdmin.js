@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Input, Button, Form, notification } from 'antd';
+import { Input, Form, notification } from 'antd';
+import {Button} from "react-bootstrap"
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import logo from '../../Icon/logo.jpg'; // Import your logo image
 import '../../CSS/loginad.css'; // Import your CSS file
@@ -65,7 +66,7 @@ const LoginAdmin = () => {
             <Input.Password placeholder="Password" />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading}>
+            <Button variant="dark" type='submit' htmlType="submit" loading={loading}>
               Log in
             </Button>
           </Form.Item>

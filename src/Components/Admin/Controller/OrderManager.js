@@ -4,15 +4,14 @@ import { EyeOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
-import http from "../../../HTTP/http";
-import '../../../CSS/ordermanager.css'; // Ensure you import the CSS file
+import "../../../CSS/ordermanager.css"; // Ensure you import the CSS file
 
 const { Title } = Typography;
 
 const OrderManager = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [customerNames, setCustomerNames] = useState({});
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [viewingDetails, setViewingDetails] = useState(false);
 
   const dispatch = useDispatch();
@@ -26,23 +25,25 @@ const OrderManager = () => {
   const fetchOrders = async () => {
     try {
       const response = await axiosAdmin.get("/api/getallcart");
-      const orders = response.data;
-
-      const customerNamesMap = {};
-      for (const order of orders) {
-        const customerResponse = await axiosAdmin.get(
-          `/api/getcusbyid/${order.idUser}`
-        );
-        customerNamesMap[order.idUser] = customerResponse.data.hoTen;
-      }
-
-      setCustomerNames(customerNamesMap);
-      setOrders(orders);
+      setOrders(response.data);
     } catch (error) {
       notification.error({
         message: "Error",
         description: "Failed to fetch orders.",
       });
+    }
+  };
+
+  const fetchCustomer = async (idUser) => {
+    try {
+      const response = await axiosAdmin.get(`/api/getcusbyid/${idUser}`);
+      setSelectedCustomer(response.data);
+    } catch (error) {
+      console.error(
+        `Failed to fetch customer details for ID: ${idUser}`,
+        error
+      );
+      setSelectedCustomer({ idUser: "Unknown", userName: "Unknown" }); // Set default values
     }
   };
 
@@ -59,8 +60,9 @@ const OrderManager = () => {
     }
   };
 
-  const handleViewDetails = (idDonHang) => {
+  const handleViewDetails = (idDonHang, idUser) => {
     fetchOrderDetails(idDonHang);
+    fetchCustomer(idUser);
   };
 
   const handleBackToOrders = () => {
@@ -68,10 +70,21 @@ const OrderManager = () => {
     setSelectedOrder(null);
   };
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case "waiting":
+        return "Chờ xác nhận";
+      case "delivery":
+        return "Đang giao";
+      case "success":
+        return "Giao hàng thành công";
+      default:
+        return "Không xác định";
+    }
+  };
+
   const getStatusStyle = (status) => {
     switch (status) {
-      case "unpaid":
-        return { color: "red" };
       case "waiting":
         return { color: "orange" };
       case "delivery":
@@ -93,6 +106,13 @@ const OrderManager = () => {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
+  const formatPrice = (price) => {
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+  };
+
   const columns = [
     {
       title: "ID Đơn Hàng",
@@ -100,27 +120,21 @@ const OrderManager = () => {
       key: "idDonHang",
     },
     {
-      title: "Tên Khách Hàng",
-      dataIndex: "idUser",
-      key: "idUser",
-      render: (idUser) => customerNames[idUser] || "Loading...",
-    },
-    {
       title: "Phương Thức Thanh Toán",
-      dataIndex: "tenPhuongThuc",
-      key: "tenPhuongThuc",
+      dataIndex: "phuongThucTT",
+      key: "phuongThucTT",
     },
     {
       title: "Ngày Đặt Hàng",
       dataIndex: "ngayDatHang",
       key: "ngayDatHang",
-      render: (text, record) =>
-        record.trangThai === "waiting"  ? formatDate(text) : "N/A",
+      render: (text) => formatDate(text),
     },
     {
       title: "Tổng Tiền",
       dataIndex: "tongTienDH",
       key: "tongTienDH",
+      render: (text) => formatPrice(text),
     },
     {
       title: "Trạng Thái",
@@ -128,10 +142,7 @@ const OrderManager = () => {
       key: "trangThai",
       render: (text) => (
         <span style={getStatusStyle(text)}>
-          {text === "unpaid" && "Chưa thanh toán"}
-          {text === "waiting" && "Chờ xác nhận"}
-          {text === "delivery" && "Đang giao"}
-          {text === "success" && "Giao hàng thành công"}
+          {getStatusText(text)}
         </span>
       ),
     },
@@ -142,7 +153,7 @@ const OrderManager = () => {
         <span>
           <Button
             icon={<EyeOutlined />}
-            onClick={() => handleViewDetails(record.idDonHang)}
+            onClick={() => handleViewDetails(record.idDonHang, record.idUser)}
             style={{ marginRight: 8 }}
           />
         </span>
@@ -151,7 +162,7 @@ const OrderManager = () => {
   ];
 
   return (
-    <div>
+    <div className="order-manager-container">
       {viewingDetails ? (
         <div className="order-details-container">
           <Button
@@ -162,50 +173,79 @@ const OrderManager = () => {
             Back to Orders
           </Button>
           {selectedOrder ? (
-            <div>
-              <Title level={3} style={{textAlign: "center"}}>Chi Tiết Đơn Hàng</Title>
-              <p>ID Đơn Hàng: {selectedOrder.idDonHang}</p>
-              <p>Tên Khách Hàng: {customerNames[selectedOrder.idUser]}</p>
-              <p>Phương Thức Thanh Toán: {selectedOrder.tenPhuongThuc}</p>
-              <p>
-                Ngày Đặt Hàng:{" "}
-                {selectedOrder.trangThai === "waiting"
-                  ? formatDate(selectedOrder.ngayDatHang)
-                  : ""}
-              </p>
-              <p>Tổng Tiền: {selectedOrder.tongTienDH}</p>
-              <p>Trạng Thái: {selectedOrder.trangThai}</p>
-              <Table
-                columns={[
-                  {
-                    title: "Sản Phẩm",
-                    dataIndex: "tenSanPham",
-                    key: "tenSanPham",
-                  },
-                  {
-                    title: "Hình Sản Phẩm",
-                    dataIndex: "hinhSP",
-                    key: "hinhSP",
-                    render: (hinhSP) => (
-                      <img src={hinhSP} alt="Product" />
-                    ),
-                  },
-                  { title: "Số Lượng", dataIndex: "soLuong", key: "soLuong" },
-                  { title: "Đơn Giá", dataIndex: "donGia", key: "donGia" },
-                  { title: "Thành Tiền", dataIndex: "tongTien", key: "tongTien" },
-                ]}
-                dataSource={selectedOrder.details || []} // Ensure this matches your data structure
-                rowKey="idChiTietDH"
-                pagination={false}
-                className="order-details-table"
-              />
+            <div className="order-details-grid">
+              <div className="order-details-left">
+                <Title level={3} style={{ textAlign: "left" }}>
+                  Chi Tiết Đơn Hàng
+                </Title>
+                <p>ID Đơn Hàng: {selectedOrder.idDonHang}</p>
+                <p>ID User: {selectedOrder.idUser}</p>
+                <p>User Name: {selectedCustomer?.userName || "N/A"}</p>
+                <p>Tên Người Nhận: {selectedOrder.tenNguoiNhan || "N/A"}</p>
+                <p>Số Điện Thoại Người Nhận: <b>{selectedOrder.SDT || "N/A"}</b></p>
+                <p>Địa Chỉ: <b>{selectedOrder.diaChi || "N/A"}</b></p>
+                <p>
+                  Phương Thức Thanh Toán: {selectedOrder.phuongThucTT || "N/A"}
+                </p>
+                <p>Ngày Đặt Hàng: {formatDate(selectedOrder.ngayDatHang)}</p>
+                <p>
+                  Tổng Tiền: {formatPrice(selectedOrder.tongTienDH) || "N/A"}
+                </p>
+                <p>Nhân viên xác nhận: {selectedOrder.tenNhanVien || "N/A"}</p>
+                <p>Đơn vị vận chuyển: {selectedOrder.tenDonVi || "N/A"}</p>
+                <p>
+                  Trạng Thái:{" "}
+                  <span style={getStatusStyle(selectedOrder.trangThai)}>
+                    {getStatusText(selectedOrder.trangThai)}
+                  </span>
+                </p>
+              </div>
+              <div className="order-details-right">
+                <Table
+                  columns={[
+                    {
+                      title: "Sản Phẩm",
+                      dataIndex: "tenSanPham",
+                      key: "tenSanPham",
+                    },
+                    {
+                      title: "Hình Sản Phẩm",
+                      dataIndex: "hinhSP",
+                      key: "hinhSP",
+                      render: (hinhSP) => <img src={hinhSP} alt="Product" />,
+                    },
+                    { title: "Số Lượng", dataIndex: "soLuong", key: "soLuong" },
+                    {
+                      title: "Đơn Giá",
+                      dataIndex: "donGia",
+                      key: "donGia",
+                      render: (text) => formatPrice(text),
+                    },
+                    {
+                      title: "Thành Tiền",
+                      dataIndex: "tongTien",
+                      key: "tongTien",
+                      render: (text) => formatPrice(text),
+                    },
+                  ]}
+                  dataSource={selectedOrder.details || []} // Ensure this matches your data structure
+                  rowKey="idChiTietDH"
+                  pagination={false}
+                  className="order-details-table"
+                />
+              </div>
             </div>
           ) : (
             <p>Loading...</p>
           )}
         </div>
       ) : (
-        <Table columns={columns} dataSource={orders} rowKey="idDonHang" />
+        <>
+          <Title level={2} style={{ marginBottom: 16 }}>
+            Quản lí đơn hàng
+          </Title>
+          <Table columns={columns} dataSource={orders} rowKey="idDonHang" />
+        </>
       )}
     </div>
   );

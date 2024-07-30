@@ -21,6 +21,9 @@ import PhoneTypeManager from './Controller/PhoneTypeManager';
 import PhoneModelManager from './Controller/PhoneModelManager';
 import ShipManager from './Controller/ShipManager';
 import OrderManager from './Controller/OrderManager';
+import OrderConfirmManager from './Controller/OrderConfirmManager';
+import OrderDeliveryManager from './Controller/OrderDeliverManager';
+import OrderDoneManager from './Controller/OrderDoneManager';
 
 const { Header, Sider, Content } = Layout;
 
@@ -219,6 +222,9 @@ const Template = () => {
           {selectedMenu === '4' && <PhoneTypeManager />}
           {selectedMenu === '7' && <ShipManager />}
           {selectedMenu === '8' && <OrderManager />}
+          {selectedMenu === '9' && <OrderConfirmManager/>}
+          {selectedMenu === '10' && <OrderDeliveryManager />}
+          {selectedMenu === '11' && <OrderDoneManager/>}
 
         </Content>
       </Layout>

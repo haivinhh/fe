@@ -12,9 +12,11 @@ import Form from "react-bootstrap/Form";
 import { useParams } from "react-router-dom";
 import http from "../HTTP/http";
 import { useDispatch, useSelector } from "react-redux";
-import { createOrUpdateCart } from "../redux/apiRequest"; // Import the function
+import { createOrUpdateCart } from "../redux/apiRequest";
 import { createAxios } from "../redux/createInstance";
 import { loginSuccess } from "../redux/authSlice";
+import { notification } from "antd"; // Import Ant Design notification component
+
 
 const DetailProduct = () => {
   const { idSanPham } = useParams();
@@ -67,13 +69,22 @@ const DetailProduct = () => {
       const result = await createOrUpdateCart(idSanPham, count, customer.accessToken, axiosJWT);
 
       if (result.success) {
-        alert("Added to cart successfully");
+        notification.success({
+          message: 'Thành công',
+          description: 'Sản phẩm đã được thêm vào giỏ hàng thành công!',
+        });
       } else {
-        alert(`Failed to add to cart: ${result.error}`);
+        notification.error({
+          message: 'Lỗi',
+          description: `Không thể thêm vào giỏ hàng: ${result.error}`,
+        });
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-      alert("Failed to add to cart. Please try again later.");
+      notification.error({
+        message: 'Lỗi',
+        description: 'Không thể thêm vào giỏ hàng. Vui lòng thử lại sau.',
+      });
     }
   };
 

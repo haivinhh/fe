@@ -14,7 +14,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [address, setAddress] = useState("");
+
   const [email, setEmail] = useState("");
   const [validationError, setValidationError] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -34,12 +34,14 @@ const Register = () => {
     // Validate password complexity
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
     if (!passwordPattern.test(password)) {
-      setValidationError("Mật khẩu phải chứa ít nhất một chữ cái và một chữ số, từ 6 ký tự trở lên");
+      setValidationError(
+        "Mật khẩu phải chứa ít nhất một chữ cái và một chữ số, từ 6 ký tự trở lên"
+      );
       return;
     }
 
     // Validate phone number is numeric
-    if (!(/^\d+$/.test(phoneNumber))) {
+    if (!/^\d+$/.test(phoneNumber)) {
       setValidationError("Số điện thoại chỉ được chứa các ký tự số");
       return;
     }
@@ -52,7 +54,6 @@ const Register = () => {
       passWord: password,
       hoTen: fullName,
       SDT: phoneNumber,
-      diaChi: address,
       email: email,
     };
 
@@ -66,7 +67,6 @@ const Register = () => {
       setConfirmPassword("");
       setFullName("");
       setPhoneNumber("");
-      setAddress("");
       setEmail("");
 
       // Show success message
@@ -88,13 +88,21 @@ const Register = () => {
         <h2 className="text-center">ĐĂNG KÝ</h2>
 
         {showSuccessMessage && (
-          <Alert variant="success" onClose={() => setShowSuccessMessage(false)} dismissible>
+          <Alert
+            variant="success"
+            onClose={() => setShowSuccessMessage(false)}
+            dismissible
+          >
             Đăng ký thành công! Đăng nhập để tiếp tục.
           </Alert>
         )}
 
         {validationError && (
-          <Alert variant="danger" onClose={() => setValidationError("")} dismissible>
+          <Alert
+            variant="danger"
+            onClose={() => setValidationError("")}
+            dismissible
+          >
             {validationError}
           </Alert>
         )}
@@ -146,16 +154,6 @@ const Register = () => {
               placeholder="Số điện thoại"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3" controlId="address">
-            <Form.Control
-              type="text"
-              placeholder="Địa chỉ"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
               required
             />
           </Form.Group>

@@ -45,22 +45,19 @@ export const registerCus = async (user, dispatch, navigate) => {
   }
 };
 
-export const logOutCus = async (
-  dispatch,
-  idUser,
-  navigate,
-  accessToken,
-  axiosJWT
-) => {
+export const logOutCus = async (dispatch, navigate, accessToken, axiosJWT) => {
   dispatch(logOutStart());
   try {
-    await axiosJWT.post("/api/cuslogout", idUser, {
+    // Ensure the headers are included correctly
+    await axiosJWT.post("/api/cuslogout",{}, {
       headers: { token: `Bearer ${accessToken}` },
     });
+    
     dispatch(logOutSuccess());
     dispatch(getCartLogout());
     navigate("/");
   } catch (err) {
+    console.error("Logout failed:", err);
     dispatch(logOutFailed());
   }
 };
@@ -269,7 +266,14 @@ export const updateCustomerAddress = async (newAddress, accessToken, axiosJWT) =
     return { success: false, error: error.response?.data || error.message };
   }
 };
-export const payCOD = async (idDonHang, accessToken, axiosJWT) => {
+export const payCOD = async (
+  idDonHang,
+  accessToken,
+  axiosJWT,
+  recipientName,
+  recipientPhone,
+  recipientAddress
+) => {
   try {
     if (!axiosJWT) {
       throw new Error('Axios instance is not defined');
@@ -277,7 +281,12 @@ export const payCOD = async (idDonHang, accessToken, axiosJWT) => {
 
     const response = await axiosJWT.post(
       "/api/paycod",
-      { idDonHang },
+      {
+        idDonHang,
+        recipientName,
+        recipientPhone,
+        recipientAddress
+      },
       {
         headers: { token: `Bearer ${accessToken}` },
       }
@@ -293,3 +302,4 @@ export const payCOD = async (idDonHang, accessToken, axiosJWT) => {
     return { success: false, message: err.response?.data.message || err.message };
   }
 };
+

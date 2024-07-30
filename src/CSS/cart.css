@@ -2,16 +2,9 @@
   width: 80%;
   margin: 0 auto;
 }
-.ant-btn {
-  background-color: #000;
-  color: #fff;
-  border: none;
-}
-.ant-btn-primary {
-  background-color: #000;
-  color: #fff;
-  border: none;
-}
+
+
+
 .table img {
   width: 100px;
   height: 100px;
@@ -21,11 +14,60 @@
 
 .cart-summary {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  justify-content: space-between;
   margin-top: 20px;
 }
 
-.payment-options {
+.recipient-info {
+  flex: 1; /* Allow this section to take up as much space as needed */
+  margin-right: 20px; /* Space between the recipient info and total section */
+  text-align: left;
+}
+
+.cart-total {
+  text-align: right;
+  margin-top: 20px; /* Space between recipient info and total section */
+}
+
+.payment-method {
   margin-top: 10px;
+}
+
+.payment-method {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.payment-button {
+  margin-top: 20px;
+}
+
+.cart-table-container {
+  margin-top: 20px;
+}
+
+.ant-table-tbody > tr > td {
+  text-align: center;
+}
+
+.ant-table-tbody > tr > td:first-child,
+.ant-table-tbody > tr > td:nth-child(2) {
+  text-align: left;
+}
+
+.recipient-info div {
+  margin-bottom: 10px; /* Space between input fields */
+  display: flex;
+  flex-direction: column; /* Align items vertically */
+}
+
+input.ant-input {
+  width: 100%; /* Full width of the parent container */
+  max-width: 350px; /* Optional: Set a max-width to control input field size */
+}
+
+.ant-radio-group {
+  display: flex;
+  flex-direction: row; /* Align radio buttons horizontally */
+  gap: 10px; /* Optional: Add some space between radio buttons */
 }

@@ -105,14 +105,13 @@ const ProfileCustomer = () => {
 
   const labelMapping = {
     hoTen: "Họ và tên",
-    diaChi: "Địa chỉ",
     SDT: "Số điện thoại",
     email: "Email",
     userName: "Tên đăng nhập",
     passWord: "Mật khẩu",
   };
 
-  const orderedFields = ["hoTen", "SDT", "email", "diaChi"];
+  const orderedFields = ["hoTen", "SDT", "email"];
 
   const handleEditClick = (field) => {
     setIsEditing(field);

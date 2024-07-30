@@ -20,10 +20,16 @@ const Header = ({ onSearch }) => {
   const customer = useSelector((state) => state.auth.login?.currentUser);
   const accessToken = customer?.accessToken;
   const idUser = customer?.idUser;
+  
+  // Create axios instance
   let axiosJWT = createAxios(customer, dispatch, logOutSuccess, getCartLogout);
 
-  const handleLogoutClick = () => {
-    logOutCus(dispatch, idUser, navigate, accessToken, axiosJWT);
+  const handleLogoutClick = async () => {
+    try {
+      await logOutCus(dispatch, navigate, accessToken, axiosJWT);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   useEffect(() => {
