@@ -163,22 +163,26 @@ const ProductManager = () => {
       title: "Tên sản phẩm",
       dataIndex: "tenSanPham",
       key: "tenSanPham",
+      align: "left",
     },
     {
       title: "Giá",
       dataIndex: "donGia",
       key: "donGia",
       render: (text) => formatPrice(text),
+      align: "left",
     },
     {
       title: "Thông tin",
       dataIndex: "thongTinSP",
       key: "thongTinSP",
+      align: "left",
     },
     {
       title: "Số lượng",
       dataIndex: "soLuong",
       key: "soLuong",
+      align: "left",
     },
     {
       title: "Hình sản phẩm",
@@ -191,18 +195,21 @@ const ProductManager = () => {
           style={{ width: 50, height: 50 }}
         />
       ),
+      align: "center",
     },
     {
       title: "Danh mục sản phẩm",
       dataIndex: "danhMucSP",
       key: "danhMucSP",
       render: (text) => getCategoryName(text),
+      align: "left",
     },
     {
       title: "Dòng điện thoại",
       dataIndex: "dongDT",
       key: "dongDT",
       render: (text) => getPhoneLineName(text),
+      align: "left",
     },
     {
       title: "Hành động",
@@ -221,6 +228,7 @@ const ProductManager = () => {
           />
         </span>
       ),
+      align: "left",
     },
   ];
 

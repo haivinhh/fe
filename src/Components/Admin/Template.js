@@ -24,7 +24,7 @@ import OrderManager from './Controller/OrderManager';
 import OrderConfirmManager from './Controller/OrderConfirmManager';
 import OrderDeliveryManager from './Controller/OrderDeliverManager';
 import OrderDoneManager from './Controller/OrderDoneManager';
-
+import CustomerAccManager from './Controller/CustomerAccManager';
 const { Header, Sider, Content } = Layout;
 
 const Template = () => {
@@ -172,6 +172,7 @@ const Template = () => {
               onClick: () => handleMenuClick("12"),
               style:{textAlign: "left"}
             },
+            
           ]}
         />
       </Sider>
@@ -220,11 +221,13 @@ const Template = () => {
           {selectedMenu === '2' && <CateManager />}
           {selectedMenu === '3' && <PhoneModelManager />}
           {selectedMenu === '4' && <PhoneTypeManager />}
+          {selectedMenu === '6' && <CustomerAccManager/>}
           {selectedMenu === '7' && <ShipManager />}
           {selectedMenu === '8' && <OrderManager />}
           {selectedMenu === '9' && <OrderConfirmManager/>}
           {selectedMenu === '10' && <OrderDeliveryManager />}
           {selectedMenu === '11' && <OrderDoneManager/>}
+          
 
         </Content>
       </Layout>

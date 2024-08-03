@@ -61,38 +61,45 @@ const OrderDoneManager = () => {
       title: "ID Đơn Hàng",
       dataIndex: "idDonHang",
       key: "idDonHang",
+      align: "left",
     },
     {
       title: "Tên Người Nhận",
       dataIndex: "tenNguoiNhan",
       key: "tenNguoiNhan",
+      align: "left",
     },
     {
       title: "Địa Chỉ",
       dataIndex: "diaChi",
       key: "diaChi",
+      align: "left",
     },
     {
       title: "Số Điện Thoại",
       dataIndex: "SDT",
       key: "SDT",
+      align: "left",
     },
     {
       title: "Phương Thức Thanh Toán",
       dataIndex: "phuongThucTT",
       key: "phuongThucTT",
+      align: "left",
     },
     {
       title: "Ngày Đặt Hàng",
       dataIndex: "ngayDatHang",
       key: "ngayDatHang",
       render: (text) => formatDate(text),
+      align: "left",
     },
     {
       title: "Tổng Tiền",
       dataIndex: "tongTienDH",
       key: "tongTienDH",
       render: (text) => formatPrice(text),
+      align: "left",
     },
     {
       title: "Trạng Thái",
@@ -103,6 +110,7 @@ const OrderDoneManager = () => {
           {text === "success" && "Giao hàng thành công"}
         </span>
       ),
+      align: "left",
     },
     {
       title: "Xem Chi Tiết",
@@ -113,6 +121,7 @@ const OrderDoneManager = () => {
           onClick={() => handleViewDetails(record.idDonHang)}
         ></Button>
       ),
+      
     },
   ];
   const getStatusText = (status) => {

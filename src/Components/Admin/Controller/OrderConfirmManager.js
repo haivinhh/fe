@@ -102,38 +102,45 @@ const OrderConfirmManager = () => {
       title: "ID Đơn Hàng",
       dataIndex: "idDonHang",
       key: "idDonHang",
+      align: "left",
     },
     {
       title: "Tên Người Nhận",
       dataIndex: "tenNguoiNhan",
       key: "tenNguoiNhan",
+      align: "left",
     },
     {
       title: "Địa Chỉ",
       dataIndex: "diaChi",
       key: "diaChi",
+      align: "left",
     },
     {
       title: "Số Điện Thoại",
       dataIndex: "SDT",
       key: "SDT",
+      align: "left",
     },
     {
       title: "Phương Thức Thanh Toán",
       dataIndex: "phuongThucTT",
       key: "phuongThucTT",
+      align: "left",
     },
     {
       title: "Ngày Đặt Hàng",
       dataIndex: "ngayDatHang",
       key: "ngayDatHang",
       render: (text) => formatDate(text),
+      align: "left",
     },
     {
       title: "Tổng Tiền",
       dataIndex: "tongTienDH",
       key: "tongTienDH",
       render: (text) => formatPrice(text),
+      align: "left",
     },
     {
       title: "Trạng Thái",
@@ -144,6 +151,7 @@ const OrderConfirmManager = () => {
           {text === "waiting" && "Chờ xác nhận"}
         </span>
       ),
+      align: "left",
     },
     {
       title: "Đơn Vị Vận Chuyển",
@@ -281,13 +289,19 @@ const OrderConfirmManager = () => {
                   columns={[
                     {
                       title: "Tên Sản Phẩm",
-                      dataIndex: "tenSP",
+                      dataIndex: "tenSanPham",
                       key: "tenSP",
                     },
                     {
                       title: "Số Lượng",
                       dataIndex: "soLuong",
                       key: "soLuong",
+                    },
+                    {
+                      title: "Hình Sản Phẩm",
+                      dataIndex: "hinhSP",
+                      key: "hinhSP",
+                      render: (hinhSP) => <img src={hinhSP} alt="Product" />,
                     },
                     {
                       title: "Đơn Giá",

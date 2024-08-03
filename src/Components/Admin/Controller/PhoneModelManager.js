@@ -140,17 +140,20 @@ const PhoneModelManager = () => {
       title: "ID Dòng Điện Thoại",
       dataIndex: "idDongDT",
       key: "idDongDT",
+      align: "left",
     },
     {
       title: "Tên Dòng Điện Thoại",
       dataIndex: "tenDongDT",
       key: "tenDongDT",
+      align: "left",
     },
     {
       title: "Loại Điện Thoại",
       dataIndex: "loaiDienThoai",
       key: "loaiDienThoai",
       render: (text) => getPhoneTypeName(text),
+      align: "left",
     },
     {
       title: "Hành động",
@@ -169,6 +172,7 @@ const PhoneModelManager = () => {
           />
         </span>
       ),
+      align: "center",
     },
   ];
 

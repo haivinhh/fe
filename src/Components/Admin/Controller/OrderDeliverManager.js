@@ -75,38 +75,45 @@ const OrderDeliveryManager = () => {
       title: "ID Đơn Hàng",
       dataIndex: "idDonHang",
       key: "idDonHang",
+      align: "left",
     },
     {
       title: "Tên Người Nhận",
       dataIndex: "tenNguoiNhan",
       key: "tenNguoiNhan",
+      align: "left",
     },
     {
       title: "Địa Chỉ",
       dataIndex: "diaChi",
       key: "diaChi",
+      align: "left",
     },
     {
       title: "Số Điện Thoại",
       dataIndex: "SDT",
       key: "SDT",
+      align: "left",
     },
     {
       title: "Phương Thức Thanh Toán",
       dataIndex: "phuongThucTT",
       key: "phuongThucTT",
+      align: "left",
     },
     {
       title: "Ngày Đặt Hàng",
       dataIndex: "ngayDatHang",
       key: "ngayDatHang",
       render: (text) => formatDate(text),
+      align: "left",
     },
     {
       title: "Tổng Tiền",
       dataIndex: "tongTienDH",
       key: "tongTienDH",
       render: (text) => formatPrice(text),
+      align: "left",
     },
     {
       title: "Trạng Thái",
@@ -117,6 +124,7 @@ const OrderDeliveryManager = () => {
           {text === "delivery" && "Đang giao"}
         </span>
       ),
+      align: "left",
     },
     {
       title: "Xác Nhận Đơn Hàng",
@@ -130,6 +138,7 @@ const OrderDeliveryManager = () => {
           Giao hàng thành công
         </Button>
       ),
+      align: "center",
     },
     {
       title: "Xem Chi Tiết",
@@ -140,6 +149,7 @@ const OrderDeliveryManager = () => {
           onClick={() => handleViewDetails(record.idDonHang)}
         ></Button>
       ),
+      align: "center",
     },
   ];
   const getStatusText = (status) => {

@@ -120,11 +120,13 @@ const PhoneTypeManager = () => {
       title: "ID loại điện thoại",
       dataIndex: "idLoaiDT",
       key: "idLoaiDT",
+      align: "left",
     },
     {
       title: "Tên loại điện thoại",
       dataIndex: "tenLoaiDienThoai",
       key: "tenLoaiDienThoai",
+      align: "left",
     },
     {
       title: "Hành động",
@@ -143,6 +145,7 @@ const PhoneTypeManager = () => {
           />
         </span>
       ),
+      align: "center",
     },
   ];
 

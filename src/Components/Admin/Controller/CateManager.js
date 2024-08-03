@@ -123,11 +123,13 @@ const CateManager = () => {
         title:"ID danh mục",
         dataIndex: "idDanhMuc",
         key: "idDanhMuc",
+        align: "left",
     },
     {
       title: "Tên danh mục",
       dataIndex: "tenDanhMuc",
       key: "tenDanhMuc",
+      align: "left",
     },
     {
       title: "Hành động",
@@ -146,6 +148,7 @@ const CateManager = () => {
           />
         </span>
       ),
+      align: "center",
     },
   ];
 

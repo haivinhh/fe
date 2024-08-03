@@ -121,11 +121,13 @@ const ShipManager = () => {
       title: "ID đơn vị",
       dataIndex: "idDonViVanChuyen",
       key: "idDonViVanChuyen",
+      align: "left",
     },
     {
       title: "Tên đơn vị",
       dataIndex: "tenDonVi",
       key: "tenDonVi",
+      align: "left",
     },
     {
       title: "Hành động",
@@ -144,6 +146,7 @@ const ShipManager = () => {
           />
         </span>
       ),
+      align: "center",
     },
   ];
 

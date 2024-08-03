@@ -118,23 +118,27 @@ const OrderManager = () => {
       title: "ID Đơn Hàng",
       dataIndex: "idDonHang",
       key: "idDonHang",
+      align: "left",
     },
     {
       title: "Phương Thức Thanh Toán",
       dataIndex: "phuongThucTT",
       key: "phuongThucTT",
+      align: "left",
     },
     {
       title: "Ngày Đặt Hàng",
       dataIndex: "ngayDatHang",
       key: "ngayDatHang",
       render: (text) => formatDate(text),
+      align: "left",
     },
     {
       title: "Tổng Tiền",
       dataIndex: "tongTienDH",
       key: "tongTienDH",
       render: (text) => formatPrice(text),
+      align: "left",
     },
     {
       title: "Trạng Thái",
@@ -145,9 +149,10 @@ const OrderManager = () => {
           {getStatusText(text)}
         </span>
       ),
+      align: "left",
     },
     {
-      title: "Hành Động",
+      title: "Xem chi tiết",
       key: "action",
       render: (_, record) => (
         <span>
@@ -158,6 +163,7 @@ const OrderManager = () => {
           />
         </span>
       ),
+      align: "center",
     },
   ];
 
