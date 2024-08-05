@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
 import moment from "moment";
+import OrderDetail from "./OrderDetail";  // Import the new OrderDetail component
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -17,6 +18,8 @@ const CustomerAccManager = () => {
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [viewOrders, setViewOrders] = useState(false); // New state to toggle between views
+  const [selectedOrderId, setSelectedOrderId] = useState(null); // State for selected order ID
+  const [isOrderDetailsModalVisible, setIsOrderDetailsModalVisible] = useState(false);
 
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authAdmin.loginAdmin?.currentUser);
@@ -137,6 +140,7 @@ const CustomerAccManager = () => {
   const formatDate = (date) => moment(date).format("DD-MM-YYYY HH:mm");
 
   const formatPrice = (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  
   const getStatusText = (status) => {
     switch (status) {
       case "waiting":
@@ -241,6 +245,24 @@ const CustomerAccManager = () => {
       align: "left",
     },
     {
+      title: "Tên người nhận",
+      dataIndex: "tenNguoiNhan",
+      key:"tenNguoiNhan",
+      align: "left",
+    },
+    {
+      title: "Địa chỉ",
+      dataIndex: "diaChi",
+      key: "diaChi",
+      align: "left",
+    },
+    {
+      title:"Số điện thoại",
+      dataIndex: "SDT",
+      key: "SDT",
+      align: "left",
+    },
+    {
       title: "Phương Thức Thanh Toán",
       dataIndex: "phuongThucTT",
       key: "phuongThucTT",
@@ -270,69 +292,100 @@ const CustomerAccManager = () => {
       ),
       align: "left",
     },
+    {
+      title: "Actions",
+      key: "actions",
+      align: "left",
+      render: (_, record) => (
+        <Button
+          icon={<EyeOutlined />}
+          onClick={() => {
+            setSelectedOrderId(record.idDonHang); // Set selected order ID
+            setIsOrderDetailsModalVisible(true); // Show order details modal
+          }}
+        />
+      ),
+    },
   ];
 
   return (
-    <>
+    <div>
       {!viewOrders ? (
         <>
-          <Title level={2} style={{ marginBottom: 16 }}>Quản lý tài khoản khách hàng</Title>
+          <Title level={2}>Quản lý tài khoản khách hàng</Title>
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={openModalAdd}
             style={{ marginBottom: 16 }}
           >
-            Thêm khách hàng
+            Thêm tài khoản khách hàng
           </Button>
-          <Table columns={customerColumns} dataSource={customers} rowKey="idUser" />
+          <Table
+            columns={customerColumns}
+            dataSource={customers}
+            rowKey="idUser"
+            pagination={{ pageSize: 20 }}
+          />
           <Modal
-            title={<div style={{ textAlign: "center" }}>{editingCustomer ? "Sửa khách hàng" : "Thêm khách hàng"}</div>}
+            title={editingCustomer ? "Chỉnh sửa tài khoản khách hàng" : "Thêm tài khoản khách hàng"}
             visible={isModalVisible}
             onCancel={handleCancel}
-            footer={null}
+            onOk={() => {
+              form
+                .validateFields()
+                .then((values) => {
+                  if (editingCustomer) {
+                    handleEdit(values);
+                  } else {
+                    handleAdd(values);
+                  }
+                })
+                .catch((info) => {
+                  console.log("Validate Failed:", info);
+                });
+            }}
+            okText={editingCustomer ? "Cập nhật" : "Thêm"}
           >
             <Form
               form={form}
-              onFinish={editingCustomer ? handleEdit : handleAdd}
+              layout="vertical"
+              initialValues={editingCustomer || {}}
             >
               <Form.Item
                 name="hoTen"
                 label="Họ tên"
-                rules={[{ required: true, message: "Vui lòng nhập họ tên!" }]}
+                rules={[{ required: true, message: "Họ tên là bắt buộc" }]}
               >
                 <Input />
               </Form.Item>
               <Form.Item
                 name="userName"
                 label="Username"
-                rules={[{ required: true, message: "Vui lòng nhập username!" }]}
+                rules={[{ required: true, message: "Username là bắt buộc" }]}
               >
                 <Input />
               </Form.Item>
               <Form.Item
                 name="SDT"
                 label="Số điện thoại"
-                rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
+                rules={[{ required: true, message: "Số điện thoại là bắt buộc" }]}
               >
                 <Input />
               </Form.Item>
               <Form.Item
                 name="email"
                 label="Email"
-                rules={[{ required: true, message: "Vui lòng nhập email!" }]}
+                rules={[{ required: true, message: "Email là bắt buộc" }]}
               >
                 <Input />
               </Form.Item>
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  style={{ marginRight: 8 }}
-                >
-                  {editingCustomer ? "Cập nhật" : "Thêm"}
-                </Button>
-                <Button onClick={handleCancel}>Hủy</Button>
+              <Form.Item
+                name="KHThanThiet"
+                label="Khách hàng thân thiết"
+                valuePropName="checked"
+              >
+                
               </Form.Item>
             </Form>
           </Modal>
@@ -346,11 +399,21 @@ const CustomerAccManager = () => {
           >
             Quay lại
           </Button>
-          <Title level={2}>Chi tiết đơn hàng</Title>
-          <Table columns={orderColumns} dataSource={orders} rowKey="idDonHang" />
+          <Title level={2}>Danh sách đơn hàng</Title>
+          <Table
+            columns={orderColumns}
+            dataSource={orders}
+            rowKey="idDonHang"
+            pagination={{ pageSize: 5 }}
+          />
         </>
       )}
-    </>
+      <OrderDetail
+        idDonHang={selectedOrderId}
+        visible={isOrderDetailsModalVisible}
+        onCancel={() => setIsOrderDetailsModalVisible(false)}
+      />
+    </div>
   );
 };
 

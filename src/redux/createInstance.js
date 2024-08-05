@@ -15,6 +15,7 @@ const refreshTokenCus = async () => {
   const refreshToken = async () => {
     try {
       const res = await http.post("/api/refreshtoken", {});
+      console.log(res.data);
       return res.data;
     } catch (err) {
       console.log(err);
@@ -35,6 +36,7 @@ export const createAxios = (currentUser,dispatch,stateSuccess)  => {
               ...currentUser,
               accessToken: data.accessToken,
             };
+            console.log(refreshCustomer)
             dispatch(stateSuccess(refreshCustomer));
             config.headers["token"] = "Bearer " + data.accessToken;
           }
@@ -65,7 +67,8 @@ export const createAxiosAdmin = (currentUser, stateSuccess, dispatch) => {
       } else {
         // If token is still valid but close to expiring, refresh it
         const tokenExpiresIn = decodedToken.exp - date.getTime() / 1000;
-        const refreshThreshold = tokenExpiresIn / 2; 
+        const refreshThreshold = 120; // Refresh if less than 60 seconds
+
         if (tokenExpiresIn < refreshThreshold) {
           try {
             const data = await refreshToken();
@@ -76,6 +79,7 @@ export const createAxiosAdmin = (currentUser, stateSuccess, dispatch) => {
             dispatch(stateSuccess(refreshedUser));
             config.headers["token"] = "Bearer " + data.accessToken;
           } catch (error) {
+            console.error("Error refreshing token:", error);
             dispatch(logOutAdminSuccess());
             return Promise.reject(error); // Exit the request chain
           }
@@ -83,11 +87,10 @@ export const createAxiosAdmin = (currentUser, stateSuccess, dispatch) => {
           config.headers["token"] = "Bearer " + currentUser.accessToken;
         }
       }
+
       return config;
     },
-    (err) => {
-      return Promise.reject(err);
-    }
+    (err) => Promise.reject(err)
   );
 
   newInstance.interceptors.response.use(

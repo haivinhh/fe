@@ -160,6 +160,12 @@ const ProductManager = () => {
   };
   const columns = [
     {
+      title:"ID sản phẩm",
+      dataIndex: "idSanPham",
+      key:"idSanPham",
+      align:"left",
+    },
+    {
       title: "Tên sản phẩm",
       dataIndex: "tenSanPham",
       key: "tenSanPham",
