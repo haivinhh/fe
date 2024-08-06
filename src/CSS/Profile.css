@@ -1,0 +1,10 @@
+.profile-manager .editable-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .profile-manager .ant-form-item-label {
+    text-align: left;
+  }
+  

@@ -25,6 +25,7 @@ import OrderConfirmManager from './Controller/OrderConfirmManager';
 import OrderDeliveryManager from './Controller/OrderDeliverManager';
 import OrderDoneManager from './Controller/OrderDoneManager';
 import CustomerAccManager from './Controller/CustomerAccManager';
+import ProfileManager from './Controller/ProfileManager';
 const { Header, Sider, Content } = Layout;
 
 const Template = () => {
@@ -64,14 +65,15 @@ const Template = () => {
   // Dropdown menu items
   const userMenu = (
     <Menu>
-      <Menu.Item key="profile">
-        <a href="/profile">Thông tin cá nhân</a>
+      <Menu.Item key="profile" onClick={() => handleMenuClick('profile')}>
+        Thông tin cá nhân
       </Menu.Item>
       <Menu.Item key="logout" onClick={handleLogout}>
         Đăng xuất
       </Menu.Item>
     </Menu>
   );
+  
 
   return (
     <Layout> {/* Ensure Layout takes full height */}
@@ -217,6 +219,8 @@ const Template = () => {
             borderRadius: borderRadiusLG,
           }}
         >
+          {selectedMenu === 'profile' && <ProfileManager />}
+
           {selectedMenu === '1' && <ProductManager />} 
           {selectedMenu === '2' && <CateManager />}
           {selectedMenu === '3' && <PhoneModelManager />}

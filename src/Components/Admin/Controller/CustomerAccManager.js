@@ -119,32 +119,33 @@ const CustomerAccManager = () => {
 
   const handleDelete = async (id) => {
     confirm({
-      title: "Bạn có chắc chắn muốn xóa khách hàng này không?",
-      onOk: async () => {
-        try {
-          await axiosAdmin.delete(`/api/customer/del/${id}`);
-          fetchCustomers();
-          notification.success({
-            message: "Success",
-            description: "Customer deleted successfully.",
-            duration: 1.5,
-          });
-        } catch (error) {
-          // Extract the server message if available
-          const errorMessage = error.response && error.response.data && error.response.data.message 
-            ? error.response.data.message 
-            : "Failed to delete customer.";
-            
-          notification.error({
-            message: "Lỗi",
-            description: errorMessage,
-            duration: 1.5,
-          });
-        }
-      },
-      onCancel() {},
+        title: "Bạn có chắc chắn muốn xóa khách hàng này không?",
+        onOk: async () => {
+            try {
+                await axiosAdmin.delete(`/api/customer/del/${id}`);
+                fetchCustomers();
+                notification.success({
+                    message: "Success",
+                    description: "Customer deleted successfully.",
+                    duration: 1.5,
+                });
+            } catch (error) {
+                // Extract the server message if available
+                const errorMessage = error.response && error.response.data && error.response.data.message 
+                    ? error.response.data.message 
+                    : "Không thể xóa khách hàng vì không có quyền.";
+                
+                notification.error({
+                    message: "Lỗi",
+                    description: errorMessage,
+                    duration: 1.5,
+                });
+            }
+        },
+        onCancel() {},
     });
-  };
+};
+
 
   const openModalAdd = () => {
     form.resetFields();
