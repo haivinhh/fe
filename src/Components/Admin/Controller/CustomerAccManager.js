@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Input, notification, Typography } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ArrowLeftOutlined,LockOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
 import moment from "moment";
 import OrderDetail from "./OrderDetail";  // Import the new OrderDetail component
+import ChangePassword from "./ChangePassWord";
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -20,6 +21,8 @@ const CustomerAccManager = () => {
   const [viewOrders, setViewOrders] = useState(false); // New state to toggle between views
   const [selectedOrderId, setSelectedOrderId] = useState(null); // State for selected order ID
   const [isOrderDetailsModalVisible, setIsOrderDetailsModalVisible] = useState(false);
+  const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] = useState(false);
+  const [selectedUserIdForPasswordChange, setSelectedUserIdForPasswordChange] = useState(null);
 
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authAdmin.loginAdmin?.currentUser);
@@ -37,6 +40,7 @@ const CustomerAccManager = () => {
       notification.error({
         message: "Error",
         description: "Failed to fetch customers.",
+        duration: 1.5,
       });
     }
   };
@@ -51,23 +55,31 @@ const CustomerAccManager = () => {
       notification.error({
         message: "Error",
         description: "Failed to fetch orders.",
+        duration: 1.5,
       });
     }
   };
 
   const handleAdd = async (values) => {
     try {
-      await axiosAdmin.post("/api/customers/add", values);
+      await axiosAdmin.post("/api/customer/add", values);
       fetchCustomers();
       setIsModalVisible(false);
       notification.success({
         message: "Success",
         description: "Customer added successfully.",
+        duration: 1.5,
       });
     } catch (error) {
+      // Extract the server message if available
+      const errorMessage = error.response && error.response.data && error.response.data.message 
+        ? error.response.data.message 
+        : "Failed to add customer.";
+        
       notification.error({
         message: "Error",
-        description: "Failed to add customer.",
+        description: errorMessage,
+        duration: 1.5,
       });
     }
   };
@@ -77,7 +89,7 @@ const CustomerAccManager = () => {
       title: "Bạn có chắc chắn muốn sửa thông tin khách hàng này không?",
       onOk: async () => {
         try {
-          await axiosAdmin.put(`/api/customers/${editingCustomer.idUser}`, values);
+          await axiosAdmin.put(`/api/customer/put/${editingCustomer.idUser}`, values);
           fetchCustomers();
           setIsModalVisible(false);
           form.resetFields();
@@ -85,33 +97,48 @@ const CustomerAccManager = () => {
           notification.success({
             message: "Success",
             description: "Customer updated successfully.",
+            duration: 1.5,
           });
         } catch (error) {
+          // Extract the server message if available
+          const errorMessage = error.response && error.response.data && error.response.data.message 
+            ? error.response.data.message 
+            : "Failed to update customer.";
+            
           notification.error({
-            message: "Error",
-            description: "Failed to update customer.",
+            message: "Lỗi",
+            description: errorMessage,
+            duration: 1.5,
           });
         }
       },
       onCancel() {},
     });
   };
+  
 
   const handleDelete = async (id) => {
     confirm({
       title: "Bạn có chắc chắn muốn xóa khách hàng này không?",
       onOk: async () => {
         try {
-          await axiosAdmin.delete(`/api/customers/${id}`);
+          await axiosAdmin.delete(`/api/customer/del/${id}`);
           fetchCustomers();
           notification.success({
             message: "Success",
             description: "Customer deleted successfully.",
+            duration: 1.5,
           });
         } catch (error) {
+          // Extract the server message if available
+          const errorMessage = error.response && error.response.data && error.response.data.message 
+            ? error.response.data.message 
+            : "Failed to delete customer.";
+            
           notification.error({
-            message: "Error",
-            description: "Failed to delete customer.",
+            message: "Lỗi",
+            description: errorMessage,
+            duration: 1.5,
           });
         }
       },
@@ -221,6 +248,12 @@ const CustomerAccManager = () => {
             onClick={() => handleDelete(record.idUser)}
             danger
           />
+           <Button icon={<LockOutlined />} onClick={() => { 
+            setSelectedUserIdForPasswordChange(record.idUser);
+            setIsChangePasswordModalVisible(true);
+          }} 
+          style={{ marginLeft: 8 }}/>
+    
         </span>
       ),
     },
@@ -297,6 +330,7 @@ const CustomerAccManager = () => {
       key: "actions",
       align: "left",
       render: (_, record) => (
+        
         <Button
           icon={<EyeOutlined />}
           onClick={() => {
@@ -304,117 +338,139 @@ const CustomerAccManager = () => {
             setIsOrderDetailsModalVisible(true); // Show order details modal
           }}
         />
+        
       ),
     },
   ];
 
   return (
-    <div>
-      {!viewOrders ? (
-        <>
-          <Title level={2}>Quản lý tài khoản khách hàng</Title>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={openModalAdd}
-            style={{ marginBottom: 16 }}
-          >
-            Thêm tài khoản khách hàng
-          </Button>
-          <Table
-            columns={customerColumns}
-            dataSource={customers}
-            rowKey="idUser"
-            pagination={{ pageSize: 20 }}
-          />
-          <Modal
-            title={editingCustomer ? "Chỉnh sửa tài khoản khách hàng" : "Thêm tài khoản khách hàng"}
-            visible={isModalVisible}
-            onCancel={handleCancel}
-            onOk={() => {
-              form
-                .validateFields()
-                .then((values) => {
-                  if (editingCustomer) {
-                    handleEdit(values);
-                  } else {
-                    handleAdd(values);
-                  }
-                })
-                .catch((info) => {
-                  console.log("Validate Failed:", info);
-                });
-            }}
-            okText={editingCustomer ? "Cập nhật" : "Thêm"}
-          >
-            <Form
-              form={form}
-              layout="vertical"
-              initialValues={editingCustomer || {}}
-            >
-              <Form.Item
-                name="hoTen"
-                label="Họ tên"
-                rules={[{ required: true, message: "Họ tên là bắt buộc" }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="userName"
-                label="Username"
-                rules={[{ required: true, message: "Username là bắt buộc" }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="SDT"
-                label="Số điện thoại"
-                rules={[{ required: true, message: "Số điện thoại là bắt buộc" }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[{ required: true, message: "Email là bắt buộc" }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="KHThanThiet"
-                label="Khách hàng thân thiết"
-                valuePropName="checked"
-              >
-                
-              </Form.Item>
-            </Form>
-          </Modal>
-        </>
-      ) : (
-        <>
+    <>
+      <div style={{ marginBottom: 16 }}>
+        {viewOrders ? (
           <Button
             icon={<ArrowLeftOutlined />}
             onClick={() => setViewOrders(false)}
-            style={{ marginBottom: 16 }}
           >
-            Quay lại
+            Quay lại danh sách khách hàng
           </Button>
-          <Title level={2}>Danh sách đơn hàng</Title>
-          <Table
-            columns={orderColumns}
-            dataSource={orders}
-            rowKey="idDonHang"
-            pagination={{ pageSize: 5 }}
-          />
-        </>
+        ) : (
+          <Button icon={<PlusOutlined />} type="primary" onClick={openModalAdd}>
+            Thêm tài khoản khách hàng
+          </Button>
+        )}
+      </div>
+
+      {viewOrders ? (
+        <Table columns={orderColumns} dataSource={orders} rowKey="idDonHang" />
+      ) : (
+        <Table columns={customerColumns} dataSource={customers} rowKey="idUser" />
       )}
-      <OrderDetail
-        idDonHang={selectedOrderId}
+
+      <Modal
+        title={editingCustomer ? "Chỉnh sửa tài khoản khách hàng" : "Thêm tài khoản khách hàng"}
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={editingCustomer ? handleEdit : handleAdd}
+        >
+          <Form.Item
+            name="hoTen"
+            label="Họ tên"
+            rules={[{ required: true, message: "Please enter the name" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="userName"
+            label="Username"
+            rules={[{ required: true, message: "Please enter the username" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="SDT"
+            label="Số điện thoại"
+            rules={[{ required: true, message: "Please enter the phone number" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: "Please enter the email" }]}
+          >
+            <Input />
+          </Form.Item>
+          {!editingCustomer && (
+            <>
+            <Form.Item
+              name="password"
+              label="Mật khẩu"
+              rules={[
+                { 
+                  required: true, 
+                  message: "Vui lòng nhập mật khẩu!" 
+                },
+                { 
+                  pattern: /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,}$/,
+                  message: "Mật khẩu phải chứa ít nhất một chữ cái, một số và có ít nhất 6 ký tự!" 
+                }
+              ]}
+            >
+              <Input.Password style={{ width:"350px" }}/>
+            </Form.Item>
+            <Form.Item
+              name="confirmPassword"
+              label="Xác nhận mật khẩu"
+              dependencies={['password']}
+              hasFeedback
+              rules={[
+                { 
+                  required: true, 
+                  message: "Vui lòng xác nhận mật khẩu!" 
+                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('password') === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));
+                  },
+                }),
+              ]}
+            >
+              <Input.Password style={{ width:"350px" }}/>
+            </Form.Item>
+            </>
+          )}
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              {editingCustomer ? "Cập nhật" : "Thêm"}
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Chi tiết đơn hàng"
         visible={isOrderDetailsModalVisible}
         onCancel={() => setIsOrderDetailsModalVisible(false)}
-      />
-    </div>
+        footer={null}
+        width={800}
+      >
+        <OrderDetail orderId={selectedOrderId} />
+      </Modal>
+        <ChangePassword    visible={isChangePasswordModalVisible}
+        onCancel={() => setIsChangePasswordModalVisible(false)}
+        idUser={selectedUserIdForPasswordChange}/>
+      
+    </>
   );
 };
+
 
 export default CustomerAccManager;
