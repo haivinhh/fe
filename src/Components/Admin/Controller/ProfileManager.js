@@ -1,18 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Form, Input, notification, Typography, Row, Col } from "antd";
+import {
+  Button,
+  Modal,
+  Form,
+  Input,
+  notification,
+  Typography,
+  Row,
+  Col,
+  Table,
+} from "antd";
 import { useDispatch, useSelector } from "react-redux";
+import { EyeOutlined } from "@ant-design/icons";
 import { createAxiosAdmin } from "../../../redux/createInstance";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
+import moment from "moment";
+import OrderDetail from "./OrderDetail";
 
 const { Title } = Typography;
 
 const ProfileManager = () => {
   const [employee, setEmployee] = useState({});
+  const [orders, setOrders] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [password, setPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [isOrderDetailVisible, setIsOrderDetailVisible] = useState(false);
 
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authAdmin.loginAdmin?.currentUser);
@@ -20,6 +36,7 @@ const ProfileManager = () => {
 
   useEffect(() => {
     fetchEmployeeDetails();
+    fetchConfirmedOrders();
   }, []);
 
   const fetchEmployeeDetails = async () => {
@@ -34,11 +51,23 @@ const ProfileManager = () => {
     }
   };
 
+  const fetchConfirmedOrders = async () => {
+    try {
+      const response = await axiosAdmin.get("/api/confirmorderbyuser");
+      setOrders(response.data);
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "Failed to fetch confirmed orders.",
+      });
+    }
+  };
+
   const handleUpdatePassword = async () => {
     if (newPassword !== confirmPassword) {
       notification.error({
         message: "Error",
-        description: "New password and confirmation do not match.",
+        description: "Mật khẩu mới và xác nhận không khớp.",
       });
       return;
     }
@@ -47,23 +76,30 @@ const ProfileManager = () => {
     if (!passwordRegex.test(newPassword)) {
       notification.error({
         message: "Error",
-        description: "Password must contain at least one letter, one number, and be at least 6 characters long.",
+        description:
+          "Mật khẩu phải chứa ít nhất một chữ cái, một số và ít nhất 6 ký tự.",
       });
       return;
     }
 
     try {
-      await axiosAdmin.put("/api/user/put", { passWord: newPassword });
+      await axiosAdmin.put("/api/user/changepassword", {
+        currentPassword,
+        newPassword,
+      });
       notification.success({
         message: "Success",
-        description: "Password updated successfully.",
+        description: "Mật khẩu đã được cập nhật thành công.",
       });
-      setNewPassword('');
-      setConfirmPassword('');
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (error) {
+      const errorMsg =
+        error.response?.data?.message || "Cập nhật mật khẩu thất bại.";
       notification.error({
         message: "Error",
-        description: "Failed to update password.",
+        description: errorMsg,
       });
     }
   };
@@ -89,140 +125,322 @@ const ProfileManager = () => {
       await axiosAdmin.put("/api/user/put", values);
       notification.success({
         message: "Success",
-        description: "Profile updated successfully.",
+        description: "Cập nhật hồ sơ thành công.",
       });
       fetchEmployeeDetails();
       handleCancel();
     } catch (error) {
       notification.error({
         message: "Error",
-        description: "Failed to update profile.",
+        description: "Cập nhật hồ sơ thất bại.",
       });
     }
   };
 
+  const handleViewOrderDetails = (idDonHang) => {
+    setSelectedOrderId(idDonHang);
+    setIsOrderDetailVisible(true);
+  };
+
+  const handleOrderDetailCancel = () => {
+    setIsOrderDetailVisible(false);
+    setSelectedOrderId(null);
+  };
+
+  const formatDate = (date) => moment(date).format("DD-MM-YYYY HH:mm");
+
+  const formatPrice = (price) =>
+    new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "delivery":
+        return "Đang giao";
+      case "success":
+        return "Giao hàng thành công";
+      default:
+        return "Không xác định";
+    }
+  };
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "delivery":
+        return { color: "blue" };
+      case "success":
+        return { color: "green" };
+      default:
+        return {};
+    }
+  };
+
+  const columns = [
+    {
+      title: "ID Đơn Hàng",
+      dataIndex: "idDonHang",
+      key: "idDonHang",
+      align: "left",
+    },
+    {
+      title: "Tên Người Nhận",
+      dataIndex: "tenNguoiNhan",
+      key: "tenNguoiNhan",
+      align: "left",
+    },
+    { title: "Địa Chỉ", dataIndex: "diaChi", key: "diaChi", align: "left" },
+    {
+      title: "Số Điện Thoại",
+      dataIndex: "SDT",
+      key: "soDienThoai",
+      align: "left",
+    },
+    {
+      title: "Phương Thức Thanh Toán",
+      dataIndex: "phuongThucTT",
+      key: "phuongThucThanhToan",
+      align: "left",
+    },
+    {
+      title: "Ngày Đặt Hàng",
+      dataIndex: "ngayDatHang",
+      key: "ngayDatHang",
+      align: "left",
+      render: (text) => formatDate(text),
+    },
+    {
+      title: "Tổng Tiền",
+      dataIndex: "tongTienDH",
+      key: "tongTien",
+      align: "left",
+      render: (text) => formatPrice(text),
+    },
+    {
+      title: "Trạng Thái",
+      dataIndex: "trangThai",
+      key: "trangThai",
+      align: "left",
+      render: (text) => (
+        <span style={getStatusStyle(text)}>{getStatusText(text)}</span>
+      ),
+    },
+    {
+      title: "Đơn Vị Vận Chuyển",
+      dataIndex: "donViVanChuyen",
+      key: "donViVanChuyen",
+      align: "left",
+    },
+    {
+      title: "Hành Động",
+      key: "action",
+      render: (text, record) => (
+        <Button
+          icon={<EyeOutlined />}
+          type="link"
+          onClick={() => handleViewOrderDetails(record.idDonHang)}
+        />
+      ),
+    },
+  ];
+
   return (
     <>
-      <Title level={2}>Employee Profile</Title>
+      <Title level={2}>Hồ Sơ Nhân Viên</Title>
       <Row gutter={16}>
         <Col span={12}>
-          <div style={{ padding: 16, border: '1px solid #d9d9d9', borderRadius: 4, height: '100%' }}>
-            <Button type="primary" onClick={openModal} style={{ marginBottom: 16 }}>
-              Edit Profile
+          <div
+            style={{
+              padding: 24,
+              border: "1px solid #d9d9d9",
+              borderRadius: 4,
+              height: "100%",
+              fontSize: "16px",
+            }}
+          >
+            <div style={{ textAlign: "left" }}>
+              <p>
+                <strong>Họ Tên:</strong> {employee.hoTen}
+              </p>
+              <p>
+                <strong>Username:</strong> {employee.userName}
+              </p>
+              <p>
+                <strong>Số điện thoại:</strong> {employee.SDT}
+              </p>
+              <p>
+                <strong>Địa chỉ:</strong> {employee.diaChi}
+              </p>
+              <p>
+                <strong>Email:</strong> {employee.email}
+              </p>
+            </div>
+            <Button
+              type="primary"
+              onClick={openModal}
+              style={{ marginTop: 16 }}
+            >
+              Chỉnh sửa hồ sơ
             </Button>
-            <div>
-              <p><strong>Full Name:</strong> {employee.hoTen}</p>
-              <p><strong>Username:</strong> {employee.userName}</p>
-              <p><strong>Phone Number:</strong> {employee.SDT}</p>
-              <p><strong>Address:</strong> {employee.diaChi}</p>
-              <p><strong>Email:</strong> {employee.email}</p>
+          </div>
+        </Col>
+        <Col span={12}>
+          <div
+            style={{
+              padding: 16,
+              border: "1px solid #d9d9d9",
+              borderRadius: 4,
+              height: "100%",
+            }}
+          >
+            <Title level={3}>Đổi Mật Khẩu</Title>
+            <div style={{ maxWidth: 400, margin: "0 auto" }}>
+              <Form layout="vertical" onFinish={handleUpdatePassword}>
+                <Form.Item
+                  label="Mật khẩu hiện tại"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập mật khẩu hiện tại!",
+                    },
+                  ]}
+                >
+                  <Input.Password
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                  />
+                </Form.Item>
+                <Form.Item
+                  label="Mật khẩu mới"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập mật khẩu mới!",
+                    },
+                  ]}
+                >
+                  <Input.Password
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                </Form.Item>
+                <Form.Item
+                  label="Xác nhận mật khẩu mới"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng xác nhận mật khẩu mới!",
+                    },
+                  ]}
+                >
+                  <Input.Password
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </Form.Item>
+                <Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Đổi Mật Khẩu
+                  </Button>
+                </Form.Item>
+              </Form>
             </div>
           </div>
         </Col>
-        <Col span={12}>
-          <div style={{ padding: 16, border: '1px solid #d9d9d9', borderRadius: 4, height: '100%' }}>
-            <Title level={3}>Change Password</Title>
-            <Form
-              layout="vertical"
-              onFinish={handleUpdatePassword}
-            >
-              <Form.Item
-                label="Current Password"
-                rules={[{ required: true, message: 'Please enter your current password!' }]}
-              >
-                <Input.Password
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="New Password"
-                rules={[{ required: true, message: 'Please enter your new password!' }]}
-              >
-                <Input.Password
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Confirm New Password"
-                rules={[{ required: true, message: 'Please confirm your new password!' }]}
-              >
-                <Input.Password
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-              </Form.Item>
-
-              <Form.Item>
-                <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-                  Change Password
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
-        </Col>
       </Row>
-
+      <Title level={3} style={{ marginTop: 32 }}>
+        Đơn Hàng Đã Xác Nhận
+      </Title>
+      <Table
+        columns={columns}
+        dataSource={orders}
+        rowKey="idDonHang"
+        bordered
+      />
       <Modal
-        title={<div style={{ textAlign: 'center' }}>{employee ? "Edit Profile" : "Add Profile"}</div>}
+        title="Chỉnh sửa hồ sơ"
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
       >
         <Form
           form={form}
+          layout="vertical"
           onFinish={handleUpdateProfile}
         >
           <Form.Item
+            label="Họ Tên"
             name="hoTen"
-            label="Full Name"
-            rules={[{ required: true, message: 'Please enter your full name!' }]}
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập họ tên!",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
-
           <Form.Item
-            name="userName"
             label="Username"
-            rules={[{ required: true, message: 'Please enter your username!' }]}
+            name="userName"
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập tên đăng nhập!",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
-
           <Form.Item
+            label="Số điện thoại"
             name="SDT"
-            label="Phone Number"
-            rules={[{ required: true, message: 'Please enter your phone number!' }]}
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập số điện thoại!",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
-
           <Form.Item
+            label="Địa chỉ"
             name="diaChi"
-            label="Address"
-            rules={[{ required: true, message: 'Please enter your address!' }]}
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập địa chỉ!",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
-
           <Form.Item
-            name="email"
             label="Email"
-            rules={[{ required: true, message: 'Please enter your email!' }, { type: 'email', message: 'The input is not valid E-mail!' }]}
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập email!",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
-
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-              Update Profile
+            <Button type="primary" htmlType="submit">
+              Lưu thay đổi
             </Button>
           </Form.Item>
         </Form>
       </Modal>
+      <OrderDetail
+        visible={isOrderDetailVisible}
+        onCancel={handleOrderDetailCancel}
+        orderId={selectedOrderId}
+      />
     </>
   );
 };

@@ -78,6 +78,7 @@ const OrderConfirmManager = () => {
   const fetchOrderDetails = async (idDonHang) => {
     try {
       const response = await axiosAdmin.get(`/api/detailcart/${idDonHang}`);
+      console.log(idDonHang)
       setSelectedOrder(response.data);
       setViewingDetails(true);
     } catch (error) {
@@ -284,18 +285,12 @@ const OrderConfirmManager = () => {
                 </p>
               </div>
               <div className="order-details-right">
-                <Title level={4}>Danh Sách Sản Phẩm</Title>
                 <Table
                   columns={[
                     {
-                      title: "Tên Sản Phẩm",
+                      title: "Sản Phẩm",
                       dataIndex: "tenSanPham",
-                      key: "tenSP",
-                    },
-                    {
-                      title: "Số Lượng",
-                      dataIndex: "soLuong",
-                      key: "soLuong",
+                      key: "tenSanPham",
                     },
                     {
                       title: "Hình Sản Phẩm",
@@ -303,6 +298,7 @@ const OrderConfirmManager = () => {
                       key: "hinhSP",
                       render: (hinhSP) => <img src={hinhSP} alt="Product" />,
                     },
+                    { title: "Số Lượng", dataIndex: "soLuong", key: "soLuong" },
                     {
                       title: "Đơn Giá",
                       dataIndex: "donGia",
@@ -310,27 +306,35 @@ const OrderConfirmManager = () => {
                       render: (text) => formatPrice(text),
                     },
                     {
-                      title: "Tổng Tiền",
+                      title: "Thành Tiền",
                       dataIndex: "tongTien",
                       key: "tongTien",
                       render: (text) => formatPrice(text),
                     },
                   ]}
-                  dataSource={selectedOrder.sanPham || []}
+                  dataSource={selectedOrder.details || []}
+                  rowKey="idChiTietDH"
                   pagination={false}
+                  className="order-details-table"
                 />
               </div>
             </div>
           ) : (
-            <p>Không có chi tiết đơn hàng.</p>
+            <Typography.Text>Loading...</Typography.Text>
           )}
         </div>
       ) : (
-        <Table
-          columns={columns}
-          dataSource={orders}
-          rowKey="idDonHang"
-        />
+        <>
+          <Title level={2} style={{ marginBottom: 16 }}>
+            Quản lí đơn hàng đang giao
+          </Title>
+          <Table
+            columns={columns}
+            dataSource={orders}
+            rowKey="idDonHang"
+            pagination={false}
+          />
+        </>
       )}
     </div>
   );

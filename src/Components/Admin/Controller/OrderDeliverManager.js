@@ -116,6 +116,12 @@ const OrderDeliveryManager = () => {
       align: "left",
     },
     {
+      title: "Đơn Vị Vận Chuyển",
+      dataIndex: "tenDonVi",
+      key: "donViVanChuyen",
+      align: "left",
+    },
+    {
       title: "Trạng Thái",
       dataIndex: "trangThai",
       key: "trangThai",

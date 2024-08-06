@@ -20,7 +20,7 @@ const CustomerAccManager = () => {
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [viewOrders, setViewOrders] = useState(false); // New state to toggle between views
   const [selectedOrderId, setSelectedOrderId] = useState(null); // State for selected order ID
-  const [isOrderDetailsModalVisible, setIsOrderDetailsModalVisible] = useState(false);
+  const [isOrderDetailVisible, setIsOrderDetailVisible] = useState(false); // State for showing order detail modal
   const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] = useState(false);
   const [selectedUserIdForPasswordChange, setSelectedUserIdForPasswordChange] = useState(null);
 
@@ -158,7 +158,15 @@ const CustomerAccManager = () => {
     form.setFieldsValue(customer);
     setIsModalVisible(true);
   };
+  const handleViewOrderDetails = (idDonHang) => {
+    setSelectedOrderId(idDonHang);
+    setIsOrderDetailVisible(true);
+  };
 
+  const handleOrderDetailCancel = () => {
+    setIsOrderDetailVisible(false);
+    setSelectedOrderId(null);
+  };
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
@@ -330,16 +338,12 @@ const CustomerAccManager = () => {
       title: "Actions",
       key: "actions",
       align: "left",
-      render: (_, record) => (
-        
+      render: (text, record) => (
         <Button
           icon={<EyeOutlined />}
-          onClick={() => {
-            setSelectedOrderId(record.idDonHang); // Set selected order ID
-            setIsOrderDetailsModalVisible(true); // Show order details modal
-          }}
+          
+          onClick={() => handleViewOrderDetails(record.idDonHang)}
         />
-        
       ),
     },
   ];
@@ -456,15 +460,13 @@ const CustomerAccManager = () => {
         </Form>
       </Modal>
 
-      <Modal
-        title="Chi tiết đơn hàng"
-        visible={isOrderDetailsModalVisible}
-        onCancel={() => setIsOrderDetailsModalVisible(false)}
-        footer={null}
-        width={800}
-      >
-        <OrderDetail orderId={selectedOrderId} />
-      </Modal>
+      {selectedOrderId && (
+        <OrderDetail
+          visible={isOrderDetailVisible}
+          orderId={selectedOrderId}
+          onCancel={handleOrderDetailCancel}
+        />
+      )}
         <ChangePassword    visible={isChangePasswordModalVisible}
         onCancel={() => setIsChangePasswordModalVisible(false)}
         idUser={selectedUserIdForPasswordChange}/>

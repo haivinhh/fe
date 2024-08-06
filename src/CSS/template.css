@@ -10,7 +10,7 @@ html, body {
 
 .sider-custom {
   background: #02101d; /* Default Sider color */
-  height: 182vh; /* Full height for Sider */
+  height: 200vh; /* Full height for Sider */
   position: fixed;
   left: 0;
   top: 0;

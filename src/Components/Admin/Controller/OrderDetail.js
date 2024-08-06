@@ -1,92 +1,92 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Table, notification } from "antd";
+import { Modal, Table, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
+import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
+import moment from "moment";
 
-const OrderDetail = ({ idDonHang, visible, onCancel }) => {
+const { Title } = Typography;
+
+const OrderDetail = ({ visible, onCancel, orderId }) => {
   const [orderDetails, setOrderDetails] = useState([]);
+  const [orderInfo, setOrderInfo] = useState({});
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authAdmin.loginAdmin?.currentUser);
   const axiosAdmin = createAxiosAdmin(user, loginAdminSuccess, dispatch);
 
   useEffect(() => {
-    if (idDonHang) {
-      fetchOrderDetails(idDonHang);
+    if (orderId) {
+      fetchOrderDetails(orderId);
     }
-  }, [idDonHang]);
+  }, [orderId]);
 
-  const fetchOrderDetails = async (orderId) => {
+  const fetchOrderDetails = async (idDonHang) => {
     try {
-      const response = await axiosAdmin.get(`/api/detailcart/${orderId}`);
-      const { details } = response.data; // Assuming response data contains 'details'
-      setOrderDetails(details || []);
+      const response = await axiosAdmin.get(`/api/detailcart/${idDonHang}`);
+      setOrderDetails(response.data.details);
+      setOrderInfo(response.data);
     } catch (error) {
-      notification.error({
-        message: "Error",
-        description: "Failed to fetch order details.",
-      });
+      console.error("Failed to fetch order details", error);
     }
   };
 
+  const formatDate = (date) => moment(date).format("DD-MM-YYYY HH:mm");
+
+  const formatPrice = (price) =>
+    new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+
   const columns = [
     {
-      title: "Hình sản phẩm",
+      title: "ID Sản Phẩm",
+      dataIndex: "idSanPham",
+      key: "idSanPham",
+    },
+    {
+      title: "Hình Sản Phẩm",
       dataIndex: "hinhSP",
       key: "hinhSP",
-      render: (text) => <img src={text} alt="Product" style={{ width: 100, height: 100, objectFit: 'cover' }} />,
-      align: "left"
+      render: (text) => <img src={text} alt="Hình Sản Phẩm" style={{ width: 50, height: 50 }} />,
     },
     {
-      title: "Tên sản phẩm",
+      title: "Tên Sản Phẩm",
       dataIndex: "tenSanPham",
       key: "tenSanPham",
-      align: "left"
     },
     {
-      title: "Số lượng",
+      title: "Số Lượng",
       dataIndex: "soLuong",
       key: "soLuong",
-      align: "left"
     },
     {
-      title: "Đơn giá",
+      title: "Giá",
       dataIndex: "donGia",
       key: "donGia",
-      render: (text) =>
-        new Intl.NumberFormat("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }).format(text),
-      align: "left"
+      render: (text) => formatPrice(text),
     },
     {
-      title: "Thành tiền",
+      title: "Thành Tiền",
       dataIndex: "tongTien",
       key: "tongTien",
-      render: (text) =>
-        new Intl.NumberFormat("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }).format(text),
-      align: "left"
+      render: (text) => formatPrice(text),
     },
   ];
 
   return (
     <Modal
-      title={<span style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center', display: 'block' }}>Chi tiết đơn hàng</span>} // Center-align the title
+      
       visible={visible}
       onCancel={onCancel}
       footer={null}
-      width={1000} // Adjust the width as needed
+      width={800}
     >
-      <Table
-        columns={columns}
-        dataSource={orderDetails} // Make sure this is an array
-        rowKey="idChiTietDH"
-        pagination={{ pageSize: 5 }}
-      />
+      
+      <Title level={4} style={{ marginTop: 16 }}>
+        Chi tiết sản phẩm
+      </Title>
+      <Table columns={columns} dataSource={orderDetails} rowKey="idSanPham" />
     </Modal>
   );
 };
