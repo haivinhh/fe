@@ -11,6 +11,8 @@ import Template from './Components/Admin/Template';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LoginAdmin from './Components/Admin/LoginAdmin';
 import PrivateRoute from './Components/PrivateRoute';
+import ForgotPassword from './Components/ForgotPassword';
+import ResetPassword from './Components/ResetPassword';
 
 function App() {
 
@@ -29,7 +31,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/profilecustomer" element={<ProfileCustomer />} />
           <Route path="/getdetailcart/:idDonHang" element={<DetailCart />} />
-
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           {/* admin */}
           <Route path="/admin" element={<LoginAdmin/>}/>
           <Route path="/qlsp" element={<PrivateRoute element={Template} />} />

@@ -46,6 +46,9 @@ const Login = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+  const handleForgotPasswordNavigation = () => {
+    navigate("/forgot-password"); // Điều hướng đến trang quên mật khẩu
+  };
 
   const handleRegisterNavigation = () => {
     navigate("/register"); // Điều hướng đến trang đăng ký
@@ -101,7 +104,9 @@ const Login = () => {
               </span>
             </InputGroup>
             <div className="text-muted mt-2">
-              <a href="#">Quên mật khẩu</a> <br /> <a>Khách hàng mới? </a>
+            <a onClick={handleForgotPasswordNavigation} style={{ cursor: "pointer", color: "blue" }}>
+                Quên mật khẩu
+              </a> <br /> <a>Khách hàng mới? </a>
               <a onClick={handleRegisterNavigation} style={{ cursor: "pointer", color: "blue" }}>
                 Tạo tài khoản
               </a>
