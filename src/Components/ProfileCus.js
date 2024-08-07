@@ -25,6 +25,7 @@ import {
 } from "../redux/apiRequest";
 import "../CSS/profilecus.css";
 import edit from "../Icon/edit.png";
+import moment from "moment";
 
 const ProfileCustomer = () => {
   const customer = useSelector((state) => state.auth.login?.currentUser);
@@ -70,36 +71,19 @@ const ProfileCustomer = () => {
       } catch (error) {}
     }
   };
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+  const formatDate = (date) => moment(date).format("DD/MM/YYYY HH:mm");
 
-    const options = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false, // Use 24-hour format
-    };
-
-    const date = new Date(dateString);
-    return date.toLocaleString("vi-VN", options);
-  };
+  const formatPrice = (price) =>
+    new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
   useEffect(() => {
     fetchCustomerData();
     fetchCartData();
   }, [dispatch]);
 
-  const formatPrice = (price) => {
-    if (price === undefined || price === null) {
-      return "0 VND";
-    }
-    return price.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
-  };
+ 
 
   const customerInfo = customerData[0] || {};
 

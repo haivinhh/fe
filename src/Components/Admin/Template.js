@@ -26,6 +26,7 @@ import OrderDeliveryManager from './Controller/OrderDeliverManager';
 import OrderDoneManager from './Controller/OrderDoneManager';
 import CustomerAccManager from './Controller/CustomerAccManager';
 import ProfileManager from './Controller/ProfileManager';
+import StaffManager from './Controller/StaffManager';
 const { Header, Sider, Content } = Layout;
 
 const Template = () => {
@@ -92,77 +93,77 @@ const Template = () => {
             {
               key: "1",
               icon: <ProductOutlined />,
-              label: "Quản lí sản phẩm",
+              label: "Quản Lý Sản Phẩm",
               onClick: () => handleMenuClick("1"),
               style:{textAlign: "left"}
             },
             {
               key: "2",
               icon: <GroupOutlined />,
-              label: "Quản lí danh mục sản phẩm",
+              label: "Quản Lý Danh Mục Sản Phẩm",
               onClick: () => handleMenuClick("2"),
               style:{textAlign: "left"}
             },
             {
               key: "3",
               icon: <GroupOutlined />,
-              label: "Quản lí dòng điện thoại",
+              label: "Quản Lý Dòng Điện Thoại",
               onClick: () => handleMenuClick("3"),
               style:{textAlign: "left"}
             },
             {
               key: "4",
               icon: <GroupOutlined />,
-              label: "Quản lí loại điện thoại",
+              label: "Quản Lý Loại Điện Thoại",
               onClick: () => handleMenuClick("4"),
               style:{textAlign: "left"}
             },
             {
               key: "5",
               icon: <UserOutlined />,
-              label: "Quản lí nhân viên",
+              label: "Quản Lý Tài Khoản Nhân Viên",
               onClick: () => handleMenuClick("5"),
               style:{textAlign: "left"}
             },
             {
               key: "6",
               icon: <UserOutlined />,
-              label: "Quản lí khách hàng",
+              label: "Quản Lý Tài Khoản Khách Hàng",
               onClick: () => handleMenuClick("6"),
               style:{textAlign: "left"}
             },
             {
               key: "7",
               icon: <UserOutlined />,
-              label: "Quản lí đơn vị vận chuyển",
+              label: "Quản Lý Đơn Vị Vận Chuyển",
               onClick: () => handleMenuClick("7"),
               style:{textAlign: "left"}
             },
             {
               key: "8",
               icon: <ShoppingOutlined />,
-              label: "Quản lí đơn hàng",
+              label: "Quản Lý Đơn Hàng",
               onClick: () => handleMenuClick("8"),
               style:{textAlign: "left"}
             },
             {
               key: "9",
               icon: <ShoppingOutlined />,
-              label: "Quản lí đơn hàng chờ xác nhận",
+              label: "Quản Lý Đơn Hàng Chờ Xác Nhận",
               onClick: () => handleMenuClick("9"),
               style:{textAlign: "left"}
             },
             {
               key: "10",
               icon: <ShoppingOutlined />,
-              label: "Quản lí đơn hàng đang giao",
+              label: "Quản Lý Đơn Hàng Đang Giao",
               onClick: () => handleMenuClick("10"),
               style:{textAlign: "left"}
             },
             {
               key: "11",
               icon: <ShoppingOutlined />,
-              label: "Quản lí đơn hàng đã giao",
+              label: "Quản Lý Đơn Hàng Đã Giao",
               onClick: () => handleMenuClick("11"),
               style:{textAlign: "left"}
             },
@@ -225,6 +226,7 @@ const Template = () => {
           {selectedMenu === '2' && <CateManager />}
           {selectedMenu === '3' && <PhoneModelManager />}
           {selectedMenu === '4' && <PhoneTypeManager />}
+          {selectedMenu === '5' && <StaffManager />}
           {selectedMenu === '6' && <CustomerAccManager/>}
           {selectedMenu === '7' && <ShipManager />}
           {selectedMenu === '8' && <OrderManager />}

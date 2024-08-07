@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, notification } from "antd";
+import { Table, Button, Modal, Form, Input, notification,Typography } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { loginAdminSuccess, logOutSuccess } from "../../../redux/authSliceAdmin";
+import {
+  loginAdminSuccess,
+  logOutSuccess,
+} from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
-import http from "../../../HTTP/http";
 
+
+import "../../../CSS/ant-table.css";
+const { Title } = Typography;
 const { confirm } = Modal;
 
 const CateManager = () => {
   const [categories, setCategories] = useState([]);
-  
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [editingCategory, setEditingCategory] = useState(null);
@@ -34,7 +39,6 @@ const CateManager = () => {
       });
     }
   };
-  
 
   const handleAdd = async (values) => {
     try {
@@ -55,10 +59,13 @@ const CateManager = () => {
 
   const handleEdit = async (values) => {
     confirm({
-      title: 'Bạn có chắc chắn muốn sửa thông tin danh mục này không?',
+      title: "Bạn có chắc chắn muốn sửa thông tin danh mục này không?",
       onOk: async () => {
         try {
-          await axiosAdmin.put(`/api/danhmucspql/put/${editingCategory.idDanhMuc}`, values);
+          await axiosAdmin.put(
+            `/api/danhmucspql/put/${editingCategory.idDanhMuc}`,
+            values
+          );
           fetchCategories();
           setIsModalVisible(false);
           form.resetFields();
@@ -80,7 +87,7 @@ const CateManager = () => {
 
   const handleDelete = async (idDanhMuc) => {
     confirm({
-      title: 'Bạn có chắc chắn muốn xóa danh mục này không?',
+      title: "Bạn có chắc chắn muốn xóa danh mục này không?",
       onOk: async () => {
         try {
           await axiosAdmin.delete(`/api/danhmucspql/del/${idDanhMuc}`);
@@ -120,10 +127,10 @@ const CateManager = () => {
 
   const columns = [
     {
-        title:"ID danh mục",
-        dataIndex: "idDanhMuc",
-        key: "idDanhMuc",
-        align: "left",
+      title: "ID danh mục",
+      dataIndex: "idDanhMuc",
+      key: "idDanhMuc",
+      align: "left",
     },
     {
       title: "Tên danh mục",
@@ -154,6 +161,10 @@ const CateManager = () => {
 
   return (
     <>
+      <Title level={2} style={{ marginBottom: 16 }}>
+        Quản Lý Danh Mục Sản Phẩm
+      </Title>
+
       <Button
         type="primary"
         icon={<PlusOutlined />}
@@ -164,24 +175,25 @@ const CateManager = () => {
       </Button>
       <Table columns={columns} dataSource={categories} rowKey="idDanhMuc" />
       <Modal
-        title={<div style={{ textAlign: 'center' }}>{editingCategory ? "Sửa danh mục" : "Thêm danh mục"}</div>}
+        title={
+          <div style={{ textAlign: "center" }}>
+            {editingCategory ? "Sửa danh mục" : "Thêm danh mục"}
+          </div>
+        }
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
       >
-        <Form
-          form={form}
-          onFinish={editingCategory ? handleEdit : handleAdd}
-        >
+        <Form form={form} onFinish={editingCategory ? handleEdit : handleAdd}>
           <Form.Item
             name="tenDanhMuc"
             label="Tên danh mục"
-            rules={[{ required: true, message: 'Vui lòng nhập tên danh mục!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập tên danh mục!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+            <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
               {editingCategory ? "Cập nhật" : "Thêm"}
             </Button>
           </Form.Item>

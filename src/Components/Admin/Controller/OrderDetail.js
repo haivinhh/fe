@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createAxiosAdmin } from "../../../redux/createInstance";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 import moment from "moment";
-
+import '../../../CSS/ant-table.css';
 const { Title } = Typography;
 
 const OrderDetail = ({ visible, onCancel, orderId }) => {
@@ -84,7 +84,7 @@ const OrderDetail = ({ visible, onCancel, orderId }) => {
     >
       
       <Title level={4} style={{ marginTop: 16 }}>
-        Chi tiết sản phẩm
+        Chi tiết đơn hàng
       </Title>
       <Table columns={columns} dataSource={orderDetails} rowKey="idSanPham" />
     </Modal>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, notification } from "antd";
+import { Table, Button, Modal, Form, Input, notification,Typography } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
-
+import '../../../CSS/ant-table.css';
 const { confirm } = Modal;
+const { Title } = Typography;
 
 const PhoneTypeManager = () => {
   const [phoneTypes, setPhoneTypes] = useState([]);
@@ -151,6 +152,9 @@ const PhoneTypeManager = () => {
 
   return (
     <>
+    <Title level={2} style={{ marginBottom: 16 }}>
+            Quản Lý Loại Điện Thoại
+          </Title>
       <Button
         type="primary"
         icon={<PlusOutlined />}

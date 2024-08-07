@@ -1,0 +1,13 @@
+/* Apply custom styles to table headers */
+.ant-table-wrapper .ant-table-thead > tr > th {
+    background-color: #d6d6d6; /* Gray background */
+    color: #333; /* Text color */
+    font-weight: bold; /* Bold text */
+    border-bottom: 2px solid #bbb; /* Darker border */
+    padding: 12px; /* Padding inside header cells */
+}
+
+/* Optional: Apply custom styles to table body cells if needed */
+.ant-table-wrapper .ant-table-tbody > tr > td {
+    /* Add custom styles for body cells here if desired */
+}

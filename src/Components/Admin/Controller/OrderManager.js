@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
 import "../../../CSS/ordermanager.css"; // Ensure you import the CSS file
-
+import moment from "moment";
+import '../../../CSS/ant-table.css';
 const { Title } = Typography;
 
 const OrderManager = () => {
@@ -96,22 +97,13 @@ const OrderManager = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  };
+  const formatDate = (date) => moment(date).format("DD/MM/YYYY HH:mm");
 
-  const formatPrice = (price) => {
-    return price.toLocaleString("vi-VN", {
+  const formatPrice = (price) =>
+    new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
-    });
-  };
+    }).format(price);
 
   const columns = [
     {

@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, Select, notification } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  notification,
+  Typography,
+} from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
 import http from "../../../HTTP/http";
-
+import "../../../CSS/ant-table.css";
 const { confirm } = Modal;
 const { Option } = Select;
+const { Title } = Typography;
 
 const PhoneModelManager = () => {
   const [phoneModels, setPhoneModels] = useState([]);
@@ -71,7 +81,10 @@ const PhoneModelManager = () => {
       title: "Bạn có chắc chắn muốn sửa thông tin dòng điện thoại này không?",
       onOk: async () => {
         try {
-          await axiosAdmin.put(`/api/dongdtql/put/${editingModel.idDongDT}`, values);
+          await axiosAdmin.put(
+            `/api/dongdtql/put/${editingModel.idDongDT}`,
+            values
+          );
           fetchPhoneModels();
           setIsModalVisible(false);
           form.resetFields();
@@ -130,9 +143,9 @@ const PhoneModelManager = () => {
     form.resetFields();
     setEditingModel(null);
   };
-  const getPhoneTypeName = (id)=>{
-    const phoneType = phoneTypes.find(phoneT=>phoneT.idLoaiDT === id);
-    return phoneType ? phoneType.tenLoaiDienThoai : '';
+  const getPhoneTypeName = (id) => {
+    const phoneType = phoneTypes.find((phoneT) => phoneT.idLoaiDT === id);
+    return phoneType ? phoneType.tenLoaiDienThoai : "";
   };
 
   const columns = [
@@ -178,6 +191,9 @@ const PhoneModelManager = () => {
 
   return (
     <>
+      <Title level={2} style={{ marginBottom: 16 }}>
+        Quản Lý Dòng Điện Thoại
+      </Title>
       <Button
         type="primary"
         icon={<PlusOutlined />}
@@ -188,7 +204,11 @@ const PhoneModelManager = () => {
       </Button>
       <Table columns={columns} dataSource={phoneModels} rowKey="idDongDT" />
       <Modal
-        title={<div style={{ textAlign: "center" }}>{editingModel ? "Sửa Dòng Điện Thoại" : "Thêm Dòng Điện Thoại"}</div>}
+        title={
+          <div style={{ textAlign: "center" }}>
+            {editingModel ? "Sửa Dòng Điện Thoại" : "Thêm Dòng Điện Thoại"}
+          </div>
+        }
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
@@ -197,14 +217,18 @@ const PhoneModelManager = () => {
           <Form.Item
             name="tenDongDT"
             label="Tên Dòng Điện Thoại"
-            rules={[{ required: true, message: "Vui lòng nhập tên dòng điện thoại!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập tên dòng điện thoại!" },
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="loaiDienThoai"
             label="Loại Điện Thoại"
-            rules={[{ required: true, message: "Vui lòng chọn loại điện thoại!" }]}
+            rules={[
+              { required: true, message: "Vui lòng chọn loại điện thoại!" },
+            ]}
           >
             <Select placeholder="Chọn loại điện thoại">
               {phoneTypes.map((type) => (

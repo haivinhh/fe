@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
 import "../../../CSS/ordermanager.css";
-
+import '../../../CSS/ant-table.css';
 const { Title } = Typography;
 
 const OrderDoneManager = () => {
@@ -246,7 +246,7 @@ const OrderDoneManager = () => {
       ) : (
         <>
           <Title level={2} style={{ marginBottom: 16 }}>
-            Quản lí đơn hàng đã giao
+            Quản Lý Đơn Hàng Đã Giao
           </Title>
           <Table
             columns={columns}

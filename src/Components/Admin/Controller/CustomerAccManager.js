@@ -7,7 +7,7 @@ import { createAxiosAdmin } from "../../../redux/createInstance";
 import moment from "moment";
 import OrderDetail from "./OrderDetail";  // Import the new OrderDetail component
 import ChangePassword from "./ChangePassWord";
-
+import '../../../CSS/ant-table.css';
 const { Title } = Typography;
 const { confirm } = Modal;
 
@@ -350,6 +350,9 @@ const CustomerAccManager = () => {
 
   return (
     <>
+    <Title level={2} style={{ marginBottom: 16 }}>
+            Quản Lý Tài Khoản Khách Hàng
+          </Title>
       <div style={{ marginBottom: 16 }}>
         {viewOrders ? (
           <Button

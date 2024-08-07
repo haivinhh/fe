@@ -146,8 +146,8 @@ const ProfileManager = () => {
     setIsOrderDetailVisible(false);
     setSelectedOrderId(null);
   };
-
-  const formatDate = (date) => moment(date).format("DD-MM-YYYY HH:mm");
+  
+  const formatDate = (date) => moment(date).format("DD/MM/YYYY HH:mm");
 
   const formatPrice = (price) =>
     new Intl.NumberFormat("vi-VN", {
@@ -238,7 +238,6 @@ const ProfileManager = () => {
       render: (text, record) => (
         <Button
           icon={<EyeOutlined />}
-          type="link"
           onClick={() => handleViewOrderDetails(record.idDonHang)}
         />
       ),

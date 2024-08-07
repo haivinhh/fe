@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, Select, notification, InputNumber } from "antd";
+import { Table, Button, Modal, Form, Input, Select, notification, InputNumber,Typography } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAdminSuccess, logOutAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
-import http from "../../../HTTP/http";
 
+import '../../../CSS/ant-table.css';
 const { Option } = Select;
+const { Title } = Typography;
 const { confirm } = Modal;
 
 const ProductManager = () => {
@@ -239,7 +240,9 @@ const ProductManager = () => {
   ];
 
   return (
-    <>
+    <><Title level={2} style={{ marginBottom: 16 }}>
+    Quản Lý Sản Phẩm
+  </Title>
       <Button
         type="primary"
         icon={<PlusOutlined />}
