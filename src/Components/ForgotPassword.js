@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Container } from "react-bootstrap";
-import { Button, notification, Spin } from "antd"; // Import Spin từ Ant Design
+import { Button, notification, Spin } from "antd";
 import Header from "../Common/Header";
 import Footer from "../Common/Footer";
 
-import http from "../HTTP/http"; // Đảm bảo đường dẫn này đúng
+import http from "../HTTP/http";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
-  const [loading, setLoading] = useState(false); // Trạng thái loading
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const openNotification = (type, message, description) => {
@@ -27,7 +27,7 @@ const ForgotPassword = () => {
       const response = await http.post("/api/forgot-password", { email, username });
       if (response.status === 200) {
         openNotification('success', 'Thành công', 'Đã gửi email xác nhận! Vui lòng kiểm tra hộp thư của bạn.');
-        setTimeout(() => navigate("/login"), 2000); // Redirect to home after 2 seconds
+        setTimeout(() => navigate("/reset-password", { state: { username } }), 2000); // Pass username via state
       } else {
         openNotification('error', 'Lỗi', response.data.message || "Đã xảy ra lỗi. Vui lòng thử lại sau.");
       }
@@ -43,7 +43,7 @@ const ForgotPassword = () => {
       <Header />
       <Container className="login-container mt-5">
         <h2 className="text-center">Quên Mật Khẩu</h2>
-        <Spin spinning={loading}> {/* Thêm Spin bao quanh form */}
+        <Spin spinning={loading}>
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="username">
               <Form.Control
@@ -67,8 +67,8 @@ const ForgotPassword = () => {
               type="primary" 
               htmlType="submit" 
               className="w-100" 
-              loading={loading} // Thuộc tính loading của Ant Design Button
-              disabled={loading} // Ngăn button được bấm nhiều lần
+              loading={loading}
+              disabled={loading}
               style={{ backgroundColor: "black" }}
             >
               Gửi Email

@@ -29,8 +29,6 @@ export const loginUser = async (user, dispatch, navigate) => {
   }
 };
 
-
-
 export const registerCus = async (user, dispatch, navigate) => {
   dispatch(registerStart());
   try {
@@ -49,10 +47,14 @@ export const logOutCus = async (dispatch, navigate, accessToken, axiosJWT) => {
   dispatch(logOutStart());
   try {
     // Ensure the headers are included correctly
-    await axiosJWT.post("/api/cuslogout",{}, {
-      headers: { token: `Bearer ${accessToken}` },
-    });
-    
+    await axiosJWT.post(
+      "/api/cuslogout",
+      {},
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
+    );
+
     dispatch(logOutSuccess());
     dispatch(getCartLogout());
     navigate("/");
@@ -73,7 +75,12 @@ export const getDetailCart = async (accessToken, dispatch, axiosJWT) => {
     dispatch(getCartFailed());
   }
 };
-export const getDetailCartOfUser = async (accessToken, idDonHang, dispatch, axiosJWT) => {
+export const getDetailCartOfUser = async (
+  accessToken,
+  idDonHang,
+  dispatch,
+  axiosJWT
+) => {
   dispatch(getCartStart());
   try {
     const res = await axiosJWT.get(`/api/getdetailcart/${idDonHang}`, {
@@ -84,7 +91,12 @@ export const getDetailCartOfUser = async (accessToken, idDonHang, dispatch, axio
     dispatch(getCartFailed());
   }
 };
-export const createOrUpdateCart = async (idSanPham, soLuong, accessToken, axiosJWT) => {
+export const createOrUpdateCart = async (
+  idSanPham,
+  soLuong,
+  accessToken,
+  axiosJWT
+) => {
   try {
     const response = await axiosJWT.post(
       "/api/cart/add",
@@ -97,11 +109,17 @@ export const createOrUpdateCart = async (idSanPham, soLuong, accessToken, axiosJ
     if (response.data.success) {
       return { success: true, message: response.data.message };
     } else {
-      return { success: false, error: response.data.message || "Failed to add or update cart item" };
+      return {
+        success: false,
+        error: response.data.message || "Failed to add or update cart item",
+      };
     }
   } catch (err) {
     console.error("Error adding or updating cart item:", err);
-    return { success: false, error: err.response?.data?.message || err.message };
+    return {
+      success: false,
+      error: err.response?.data?.message || err.message,
+    };
   }
 };
 
@@ -209,22 +227,23 @@ export const changePassword = async (
 };
 export const updateUser = async (idUser, accessToken, axiosJWT) => {
   try {
-    const response = await axiosJWT.put(
-      "/api/updateuser",
-      idUser,
-      {
-        headers: { token: `Bearer ${accessToken}` },
-      }
-    );
+    const response = await axiosJWT.put("/api/updateuser", idUser, {
+      headers: { token: `Bearer ${accessToken}` },
+    });
     const { message } = response.data;
 
     if (message === "Cập nhật thông tin thành công.") {
       return { success: true, message: "Cập nhật thông tin thành công" };
-    }else if(message ==="Địa chỉ email không hợp lệ")
-      {
-        return { success: false, message: message || "Địa chỉ email không hợp lệ" };
-      } else  {
-      return { success: false, message: message || "Cập nhật thông tin thất bại" };
+    } else if (message === "Địa chỉ email không hợp lệ") {
+      return {
+        success: false,
+        message: message || "Địa chỉ email không hợp lệ",
+      };
+    } else {
+      return {
+        success: false,
+        message: message || "Cập nhật thông tin thất bại",
+      };
     }
   } catch (err) {
     return { success: false, error: err.response?.data || err.message };
@@ -243,8 +262,11 @@ export const getCustomerAddress = async (accessToken, axiosJWT) => {
   }
 };
 
-
-export const updateCustomerAddress = async (newAddress, accessToken, axiosJWT) => {
+export const updateCustomerAddress = async (
+  newAddress,
+  accessToken,
+  axiosJWT
+) => {
   try {
     const response = await axiosJWT.put(
       "/api/address",
@@ -276,7 +298,7 @@ export const payCOD = async (
 ) => {
   try {
     if (!axiosJWT) {
-      throw new Error('Axios instance is not defined');
+      throw new Error("Axios instance is not defined");
     }
 
     const response = await axiosJWT.post(
@@ -285,7 +307,7 @@ export const payCOD = async (
         idDonHang,
         recipientName,
         recipientPhone,
-        recipientAddress
+        recipientAddress,
       },
       {
         headers: { token: `Bearer ${accessToken}` },
@@ -295,11 +317,100 @@ export const payCOD = async (
     if (response.status === 200) {
       return { success: true, message: response.data.message };
     } else {
-      return { success: false, message: response.data.message || "Failed to process payment" };
+      return {
+        success: false,
+        message: response.data.message || "Failed to process payment",
+      };
     }
   } catch (err) {
     console.error("Error processing COD payment:", err);
-    return { success: false, message: err.response?.data.message || err.message };
+    return {
+      success: false,
+      message: err.response?.data.message || err.message,
+    };
   }
 };
+export const checkOrderStatus = async (accessToken, app_trans_id, axiosJWT) => {
+  try {
+    // Call the ZaloPay check order status API endpoint
+    const response = await axiosJWT.post(
+      `/api/checkorderstatus/${app_trans_id}`, // Pass app_trans_id in the URL parameters
+      {}, // No need to pass data in the request body
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
+    );
+
+    // Check the response to determine the outcome
+    if (response.data.return_code === 1) {
+      // Successfully checked order status
+      return {
+        success: true,
+        data: response.data,
+      };
+    } else {
+      // Failed to check order status
+      return {
+        success: false,
+        message: response.data.return_message || "Failed to check order status.",
+      };
+    }
+  } catch (error) {
+    // Handle errors during API call
+    console.error("Error checking order status:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message,
+    };
+  }
+};
+export const payOnline = async (
+  idDonHang,
+  accessToken,
+  axiosJWT,
+  recipientName,
+  recipientPhone,
+  recipientAddress
+) => {
+  try {
+    if (!axiosJWT) {
+      throw new Error("Axios instance is not defined");
+    }
+
+    const response = await axiosJWT.post(
+      "/api/createpayment", // Đường dẫn API của bạn
+      {
+        idDonHang,
+        tenNguoiNhan: recipientName,
+        SDT: recipientPhone,
+        diaChi: recipientAddress
+      },
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
+    );
+
+    if (response.status === 200) {
+      console.log("Order URL:", response.data.order_url);
+      return {
+        success: true,
+        message: response.data.message,
+        orderUrl: response.data.order_url // Giả sử `orderUrl` được trả về từ API
+      };
+      
+    } else {
+      return {
+        success: false,
+        message: response.data.message || "Failed to process online payment."
+      };
+    }
+  } catch (error) {
+    console.error("Error processing online payment:", error);
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message
+    };
+  }
+};
+
 

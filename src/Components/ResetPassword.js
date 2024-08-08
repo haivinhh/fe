@@ -6,7 +6,7 @@ import Footer from "../Common/Footer";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import "../CSS/login.css"; // Use the same CSS file if applicable
+import "../CSS/login.css";
 
 import http from "../HTTP/http";
 
@@ -14,6 +14,8 @@ const ResetPassword = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const token = searchParams.get("code");
+  const username = location.state?.username; // Retrieve username from location state
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -31,12 +33,13 @@ const ResetPassword = () => {
     try {
       const response = await http.post(`/api/reset-password`, {
         newPassword,
-        resetCode: token
+        resetCode: token,
+        username // Include username in the request
       });
       if (response.status === 200) {
         setShowSuccessMessage(true);
         setShowErrorMessage(false);
-        setTimeout(() => navigate("/login"), 2000); // Redirect to login page after 2 seconds
+        setTimeout(() => navigate("/login"), 2000);
       } else {
         setShowErrorMessage(true);
       }

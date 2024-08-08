@@ -7,6 +7,7 @@ import {
   deleteCartItem,
   updateCartItem,
   payCOD,
+  payOnline,
 } from "../redux/apiRequest";
 import { loginSuccess } from "../redux/authSlice";
 import { createAxios } from "../redux/createInstance";
@@ -20,7 +21,7 @@ import {
   Radio,
 } from "antd";
 import "../CSS/cart.css";
-import {Button} from "react-bootstrap"
+import { Button } from "react-bootstrap";
 
 const { Title, Text } = Typography;
 
@@ -118,7 +119,7 @@ const Cart = () => {
 
   const handleQuantityChange = async (idChiTietDH, newQuantity) => {
     const axiosJWT = createAxios(customer, dispatch, loginSuccess);
-    
+
     // Validate quantity
     if (newQuantity < 1) {
       notification.error({
@@ -127,7 +128,7 @@ const Cart = () => {
       });
       return;
     }
-  
+
     try {
       const result = await updateCartItem(
         idChiTietDH,
@@ -138,37 +139,37 @@ const Cart = () => {
       if (result.success) {
         notification.success({
           message: "Cập nhật số lượng thành công",
-          
         });
         await getDetailCart(customer.accessToken, dispatch, axiosJWT);
       } else {
         notification.error({
           message: "Cập nhật số lượng thất bại",
-          description: `Lỗi: ${result.message || 'Số lượng trong kho không đủ'}`,
+          description: `Lỗi: ${
+            result.message || "Số lượng trong kho không đủ"
+          }`,
         });
       }
     } catch (error) {
       console.error("Lỗi khi cập nhật số lượng sản phẩm:", error);
       notification.error({
         message: "Cập nhật số lượng thất bại",
-        description: "Vui lòng thử lại sau hoặc liên hệ với hỗ trợ nếu lỗi vẫn tiếp diễn.",
+        description:
+          "Vui lòng thử lại sau hoặc liên hệ với hỗ trợ nếu lỗi vẫn tiếp diễn.",
       });
     }
   };
-  
+
   const handlePayment = async () => {
-    // Check if the necessary information is provided
     if (!idDonHang) {
       notification.error({
         message: "Thanh toán thất bại",
         description: "Không tìm thấy thông tin để thanh toán.",
       });
-      console.log(idDonHang);
       return;
     }
-  
+
     if (paymentMethod === "COD") {
-      // Validate recipient information
+      // Xử lý thanh toán COD như hiện tại
       if (!recipientName || !recipientPhone || !recipientAddress) {
         notification.error({
           message: "Thanh toán thất bại",
@@ -176,12 +177,12 @@ const Cart = () => {
         });
         return;
       }
-  
+
       const axiosJWT = createAxios(customer, dispatch, loginSuccess);
-  
+
       try {
         const result = await payCOD(
-          idDonHang,                // Pass only idDonHang
+          idDonHang,
           customer.accessToken,
           axiosJWT,
           recipientName,
@@ -191,9 +192,7 @@ const Cart = () => {
         if (result.success) {
           notification.success({
             message: "Đặt hàng thành công",
-            
           });
-          // Update the cart after successful payment
           await getDetailCart(customer.accessToken, dispatch, axiosJWT);
           setRecipientName("");
           setRecipientPhone("");
@@ -211,16 +210,43 @@ const Cart = () => {
           description: "Vui lòng thử lại.",
         });
       }
+    } else if (paymentMethod === "Online") {
+      const axiosJWT = createAxios(customer, dispatch, loginSuccess);
+
+      try {
+        const result = await payOnline(
+          idDonHang,
+          customer.accessToken,
+          axiosJWT,
+          recipientName,
+          recipientPhone,
+          recipientAddress
+        );
+        if (result.success) {
+          // Chuyển hướng đến orderUrl
+          window.location.href = result.orderUrl;
+        } else {
+          notification.error({
+            message: "Thanh toán thất bại",
+            description: `Lỗi: ${
+              result.message || "Không thể khởi tạo thanh toán online"
+            }`,
+          });
+        }
+      } catch (error) {
+        console.error("Lỗi khi thanh toán online:", error);
+        notification.error({
+          message: "Thanh toán thất bại",
+          description: "Vui lòng thử lại.",
+        });
+      }
     } else {
       notification.warning({
         message: "Thanh toán thất bại",
-        description: "Chức năng thanh toán online chưa được triển khai.",
+        description: "Chức năng thanh toán không hợp lệ.",
       });
     }
   };
-  
-  
-  
 
   const columns = [
     {
@@ -301,7 +327,6 @@ const Cart = () => {
     },
   ];
 
- 
   const buttonText = paymentMethod === "COD" ? "Đặt hàng" : "Thanh toán";
 
   return (
@@ -346,7 +371,9 @@ const Cart = () => {
             </div>
           </div>
           <div className="cart-total">
-            <Title level={4}>Tổng tiền đơn hàng: {formatPrice(cartData?.[0]?.tongTienDH)}</Title>
+            <Title level={4}>
+              Tổng tiền đơn hàng: {formatPrice(cartData?.[0]?.tongTienDH)}
+            </Title>
             <div className="payment-method">
               <Title level={4}>Phương thức thanh toán</Title>
               <Radio.Group
