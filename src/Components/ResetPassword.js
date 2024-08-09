@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Form, Button, Container, InputGroup, Alert } from "react-bootstrap";
 import Header from "../Common/Header";
@@ -14,7 +14,7 @@ const ResetPassword = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const token = searchParams.get("code");
-  const username = location.state?.username; // Retrieve username from location state
+  const username = searchParams.get("username") || location.state?.username;
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,6 +22,13 @@ const ResetPassword = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!username) {
+      // If username is not provided, navigate back to forgot password
+      navigate("/forgot-password");
+    }
+  }, [username, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
