@@ -1,7 +1,9 @@
 import axios from "axios"
 
-const http = axios.create({
-  baseURL: "https://be-lvtn.onrender.com",
-  withCredentials: true,
+const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
+
+ export default axios.create({
+    baseURL: BASE_URL,
+    withCredentials: true
 });
 

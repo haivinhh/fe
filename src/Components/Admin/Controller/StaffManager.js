@@ -4,7 +4,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined,EyeOutlined  }
 import { useDispatch, useSelector } from "react-redux";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 import { createAxiosAdmin } from "../../../redux/createInstance";
-import ChangePasswordUser from "./ChangePassWorduser";
+import ChangePassword from "./ChangePassWord";
 import OrdersTable from "./OrderConfirmedByStaff";
 
 const { Option } = Select;
@@ -83,10 +83,7 @@ const StaffManager = () => {
       title: "Bạn có chắc chắn muốn sửa thông tin nhân viên này không?",
       onOk: async () => {
         try {
-          await axiosAdmin.put(`/api/users/${editingStaff.idNhanVien}`, {
-            ...values,
-            chucVu: values.admin  // Correctly map the form field to the API field
-          });
+          await axiosAdmin.put(`/api/users/${editingStaff.idNhanVien}`, values);
           fetchStaffs();
           setIsModalVisible(false);
           form.resetFields();
@@ -106,7 +103,6 @@ const StaffManager = () => {
       },
     });
   };
-  
 
   const handleDelete = async (id) => {
     Modal.confirm({
@@ -139,17 +135,9 @@ const StaffManager = () => {
 
   const openModalEdit = (staff) => {
     setEditingStaff(staff);
-    form.setFieldsValue({
-      hoTen: staff.hoTen,
-      userName: staff.userName,
-      diaChi: staff.diaChi,
-      SDT: staff.SDT,
-      email: staff.email,
-      admin: staff.admin,  // Make sure this is correctly mapped
-    });
+    form.setFieldsValue(staff);
     setIsModalVisible(true);
   };
-  
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -222,7 +210,6 @@ const StaffManager = () => {
             onClick={() => {
               setSelectedUserIdForPasswordChange(record.idNhanVien);
               setIsChangePasswordModalVisible(true);
-              console.log(record.idNhanVien);
             }}
             style={{ marginLeft: 8 }}
           />
@@ -330,7 +317,6 @@ const StaffManager = () => {
                 name="admin"
                 label="Chức vụ"
                 rules={[{ required: true, message: 'Vui lòng chọn chức vụ!' }]}
-                style={{ width:"350px"}}
               >
                 <Select>
                   <Option value={1}>Admin</Option>
@@ -349,12 +335,11 @@ const StaffManager = () => {
               </Form.Item>
             </Form>
           </Modal>
-          <ChangePasswordUser
-  visible={isChangePasswordModalVisible}
-  onCancel={() => setIsChangePasswordModalVisible(false)}
-  idNhanVien={selectedUserIdForPasswordChange}  // Pass idNhanVien correctly here
-/>
-
+          <ChangePassword
+            visible={isChangePasswordModalVisible}
+            onCancel={() => setIsChangePasswordModalVisible(false)}
+            userId={selectedUserIdForPasswordChange}
+          />
         </>
       ) : (
         <OrdersTable

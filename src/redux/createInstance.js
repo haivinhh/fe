@@ -1,9 +1,8 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import http from "../HTTP/http";
+import { useNavigate } from 'react-router-dom';
 import { logOutAdminSuccess} from "../redux/authSliceAdmin";
-import { logOutSuccess } from "../redux/authSlice";
-import { getCartLogout } from "../redux/cartSlice";
 
 const refreshTokenCus = async () => {
     try {
@@ -24,7 +23,7 @@ const refreshTokenCus = async () => {
   };
 export const createAxios = (currentUser,dispatch,stateSuccess)  => {
     const newInstance = axios.create({
-        baseURL: "https://be-lvtn.onrender.com",
+        baseURL: process.env.REACT_APP_API_URL || "http://localhost:3001",
         withCredentials: true
     });
     newInstance.interceptors.request.use(
@@ -47,22 +46,11 @@ export const createAxios = (currentUser,dispatch,stateSuccess)  => {
           return Promise.reject(err);
         }
       );
-      // Auto logout nếu server trả về 401/403 (token thực sự hết hạn hoặc không hợp lệ)
-      newInstance.interceptors.response.use(
-        (response) => response,
-        (error) => {
-          if (error.response?.status === 401 || error.response?.status === 403) {
-            dispatch(logOutSuccess());
-            dispatch(getCartLogout());
-          }
-          return Promise.reject(error);
-        }
-      );
       return newInstance;
 };
 export const createAxiosAdmin = (currentUser, stateSuccess, dispatch) => {
   const newInstance = axios.create({
-    baseURL: "http://localhost:3001",
+    baseURL: process.env.REACT_APP_API_URL || "http://localhost:3001",
     withCredentials: true,
   });
 

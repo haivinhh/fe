@@ -1,206 +1,70 @@
-# 📱 Frontend — Ứng dụng Thương Mại Điện Tử
+# Getting Started with Create React App
 
-> Giao diện người dùng xây dựng bằng **React 18** + **Redux Toolkit** + **React Bootstrap**, kết nối với Backend REST API qua Axios với cơ chế tự động làm mới JWT token.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
----
+## Available Scripts
 
-## 🗂️ Mục lục
+In the project directory, you can run:
 
-- [Tổng quan](#-tổng-quan)
-- [Tài khoản thử nghiệm](#-tài-khoản-thử-nghiệm)
-- [Công nghệ sử dụng](#-công-nghệ-sử-dụng)
-- [Cấu trúc thư mục](#-cấu-trúc-thư-mục)
-- [Cài đặt & Chạy](#-cài-đặt--chạy)
-- [Biến môi trường](#-biến-môi-trường)
-- [Luồng xác thực (Auth Flow)](#-luồng-xác-thực-auth-flow)
-- [Redux Store](#-redux-store)
-- [Các trang chính](#-các-trang-chính)
+### `npm start`
 
----
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-## 🧪 Tài khoản thử nghiệm
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-> Dùng để test nhanh mà không cần đăng ký mới.
+### `npm test`
 
-| Vai trò | Username | Mật khẩu | Trang đăng nhập |
-|---|---|---|---|
-| 👤 Khách hàng | `test` | `123Aaa` | `/login` |
-| 🛡️ Admin | `admin` | `123Vinh` | `/admin` |
-| 👔 Staff (Nhân viên) | `staff` | `123Vinh` | `/admin` |
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
----
+### `npm run build`
 
-## 🌐 Tổng quan
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-Ứng dụng bán hàng điện thoại di động với đầy đủ tính năng cho cả khách hàng và quản trị viên:
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-- Khách hàng: đăng ký, đăng nhập, duyệt sản phẩm, giỏ hàng, thanh toán COD / ZaloPay, quản lý đơn hàng
-- Admin: quản lý sản phẩm, danh mục, đơn hàng, vận chuyển, thống kê
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
----
+### `npm run eject`
 
-## ⚙️ Công nghệ sử dụng
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-| Thư viện | Phiên bản | Mục đích |
-|---|---|---|
-| React | ^18.3.1 | UI framework |
-| React Router DOM | ^6.24.0 | Điều hướng trang |
-| Redux Toolkit | ^2.2.6 | Quản lý state toàn cục |
-| redux-persist | ^6.0.0 | Lưu state vào localStorage |
-| Axios | ^1.7.2 | Gọi HTTP API |
-| jwt-decode | ^4.0.0 | Giải mã JWT token |
-| React Bootstrap | ^2.10.2 | UI components |
-| Ant Design (antd) | ^5.17.4 | UI components bổ sung |
-| Chart.js | ^4.4.3 | Biểu đồ thống kê (Admin) |
-| moment | ^2.30.1 | Xử lý ngày giờ |
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
----
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-## 📁 Cấu trúc thư mục
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-```
-src/
-├── Common/
-│   ├── Header.js          # Thanh điều hướng, tìm kiếm, nút đăng nhập/xuất
-│   └── Footer.js          # Footer chung
-│
-├── Components/
-│   ├── Home.js            # Trang chủ
-│   ├── Products.js        # Danh sách sản phẩm, lọc theo danh mục
-│   ├── DetailProduct.js   # Chi tiết sản phẩm
-│   ├── Cart.js            # Giỏ hàng
-│   ├── DetailCart.js      # Xem chi tiết đơn hàng
-│   ├── Login.js           # Đăng nhập
-│   ├── Register.js        # Đăng ký
-│   ├── ProfileCus.js      # Thông tin cá nhân & quản lý đơn hàng
-│   ├── ForgotPassword.js  # Quên mật khẩu
-│   ├── ResetPassword.js   # Đặt lại mật khẩu
-│   ├── PrivateRoute.js    # Bảo vệ route cần đăng nhập
-│   └── Admin/             # Các trang quản trị
-│
-├── redux/
-│   ├── store.js           # Cấu hình Redux store + redux-persist
-│   ├── authSlice.js       # State đăng nhập khách hàng
-│   ├── authSliceAdmin.js  # State đăng nhập admin
-│   ├── cartSlice.js       # State giỏ hàng
-│   ├── productSlice.js    # State sản phẩm
-│   ├── apiRequest.js      # Tất cả hàm gọi API
-│   └── createInstance.js  # Tạo axios instance với interceptor JWT
-│
-├── HTTP/
-│   └── http.js            # Cấu hình axios base (baseURL, withCredentials)
-│
-├── CSS/                   # File CSS tùy chỉnh
-├── Icon/                  # Hình ảnh, logo
-└── Models/                # Định nghĩa model dữ liệu
-```
+## Learn More
 
----
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-## 🚀 Cài đặt & Chạy
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Yêu cầu
-- Node.js >= 16
-- Backend đang chạy tại `http://localhost:3001`
+### Code Splitting
 
-### Các bước
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-```bash
-# 1. Cài đặt dependencies
-npm install
+### Analyzing the Bundle Size
 
-# 2. Chạy ở môi trường development
-npm start
-# → Mở http://localhost:3000
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-# 3. Build production
-npm run build
-```
+### Making a Progressive Web App
 
----
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-## 🔐 Biến môi trường
+### Advanced Configuration
 
-Tạo file `.env` ở thư mục gốc (nếu cần override):
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-```env
-REACT_APP_API_URL=http://localhost:3001
-```
+### Deployment
 
-> Mặc định `baseURL` được cấu hình trong `src/HTTP/http.js`.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
----
+### `npm run build` fails to minify
 
-## 🔒 Luồng xác thực (Auth Flow)
-
-Ứng dụng sử dụng **Access Token** (lưu trong Redux) + **Refresh Token** (lưu trong `httpOnly cookie`).
-
-```
-Đăng nhập
-    │
-    ▼
-Server trả về accessToken (hết hạn sau 120 giây)
-+ Set cookie refreshTokenCus (hết hạn sau 365 ngày)
-    │
-    ▼
-Redux lưu { accessToken, ... } vào store (persist sang localStorage)
-    │
-    ▼
-Mỗi request qua axiosJWT:
-  ├─ Token còn hạn  → gửi request bình thường
-  └─ Token hết hạn  → gọi /api/refreshtokencus
-                       → nhận accessToken mới
-                       → dispatch loginSuccess cập nhật store
-                       → tiếp tục request
-    │
-    ▼
-Nếu server trả 401/403 → tự động dispatch logOutSuccess + xóa cart
-```
-
-### Đăng xuất
-
-- Gọi `POST /api/cuslogout` → server xóa cookie `refreshTokenCus`
-- Dispatch `logOutSuccess()` → Redux xóa `currentUser`
-- Dispatch `getCartLogout()` → Redux xóa giỏ hàng
-- Redirect về `/`
-- **Nếu API lỗi**: vẫn thực hiện đủ các bước trên, user không bị kẹt
-
----
-
-## 🗃️ Redux Store
-
-```
-store
-├── auth (persisted)
-│   └── login
-│       ├── currentUser   ← { accessToken, idUser, ... } | null
-│       ├── isFetching
-│       └── error
-│
-├── cart
-│   └── ...
-│
-└── authAdmin
-    └── ...
-```
-
-> `authAdmin` được blacklist khỏi persist — admin luôn phải đăng nhập lại khi reload.
-
----
-
-## 📄 Các trang chính
-
-| Đường dẫn | Component | Mô tả |
-|---|---|---|
-| `/` | `Home.js` | Trang chủ, banner, sản phẩm nổi bật |
-| `/sanpham` | `Products.js` | Danh sách sản phẩm |
-| `/sanpham/danhmuc/:id` | `Products.js` | Lọc theo danh mục |
-| `/sanpham/search=:keyword` | `Products.js` | Tìm kiếm |
-| `/chitietsp/:id` | `DetailProduct.js` | Chi tiết sản phẩm |
-| `/cart` | `Cart.js` | Giỏ hàng |
-| `/detailcart/:id` | `DetailCart.js` | Chi tiết đơn hàng |
-| `/login` | `Login.js` | Đăng nhập |
-| `/register` | `Register.js` | Đăng ký |
-| `/profilecustomer` | `ProfileCus.js` | Thông tin & đơn hàng (cần đăng nhập) |
-| `/forgotpassword` | `ForgotPassword.js` | Quên mật khẩu |
-| `/admin/*` | `Admin/` | Trang quản trị (cần đăng nhập admin) |
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
