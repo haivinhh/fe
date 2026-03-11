@@ -369,9 +369,11 @@ const CustomerAccManager = () => {
       </div>
 
       {viewOrders ? (
-        <Table columns={orderColumns} dataSource={orders} rowKey="idDonHang" />
+        <Table
+            scroll={{ x: "max-content" }} columns={orderColumns} dataSource={orders} rowKey="idDonHang" />
       ) : (
-        <Table columns={customerColumns} dataSource={customers} rowKey="idUser" />
+        <Table
+            scroll={{ x: "max-content" }} columns={customerColumns} dataSource={customers} rowKey="idUser" />
       )}
 
       <Modal

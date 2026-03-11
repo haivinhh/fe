@@ -1,3 +1,4 @@
+/* filter.css */
 .filter-section {
   margin-bottom: 1rem;
 }
@@ -10,8 +11,21 @@
 .basic-multi-select {
   margin-bottom: 1rem;
 }
+
 .pagination-container {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .filter-section {
+    margin-bottom: 0.5rem;
+  }
+  .pagination-container {
+    margin-top: 12px;
+  }
 }

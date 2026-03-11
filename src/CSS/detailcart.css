@@ -1,37 +1,46 @@
-/* CSS file: detailCart.css */
+/* detailCart.css */
 .cart-container {
-    width: 80%;
-    margin: 0 auto;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cart-table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.cart-table-container .ant-table {
+  margin-top: 20px;
+  min-width: 500px;
+}
+
+.cart-table-container .ant-table-tbody > tr > td {
+  text-align: left;
+}
+
+.cart-table-container .ant-table-tbody > tr > td:first-child {
+  text-align: left;
+}
+
+.cart-table-container .ant-table-summary {
+  text-align: left;
+}
+
+.cart-table-container .ant-table-summary .ant-table-summary-cell {
+  text-align: left;
+}
+
+.cart-table-container .ant-table-tbody > tr > td:nth-child(3),
+.cart-table-container .ant-table-tbody > tr > td:nth-child(4),
+.cart-table-container .ant-table-tbody > tr > td:nth-child(5) {
+  text-align: left;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .cart-container {
+    width: 100%;
+    padding: 0 8px;
   }
-  
-  .cart-table-container {
-    margin-top: 20px;
-  }
-  
-  .cart-table-container .ant-table {
-    margin-top: 20px;
-  }
-  
-  .cart-table-container .ant-table-tbody > tr > td {
-    text-align: left; /* Align all table cells to the left */
-  }
-  
-  .cart-table-container .ant-table-tbody > tr > td:first-child {
-    text-align: left; /* Align image column to the left */
-  }
-  
-  .cart-table-container .ant-table-summary {
-    text-align: left; /* Align summary content to the left */
-  }
-  
-  .cart-table-container .ant-table-summary .ant-table-summary-cell {
-    text-align: left; /* Align summary cell text to the left */
-  }
-  
-  /* Specific column alignment */
-  .cart-table-container .ant-table-tbody > tr > td:nth-child(3),
-  .cart-table-container .ant-table-tbody > tr > td:nth-child(4),
-  .cart-table-container .ant-table-tbody > tr > td:nth-child(5) {
-    text-align: left; /* Align specific columns to the left */
-  }
-  
+}

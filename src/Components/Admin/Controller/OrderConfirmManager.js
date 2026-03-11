@@ -279,6 +279,7 @@ const OrderConfirmManager = () => {
               </div>
               <div className="order-details-right">
                 <Table
+            scroll={{ x: "max-content" }}
                   columns={[
                     {
                       title: "Sản Phẩm",
@@ -322,6 +323,7 @@ const OrderConfirmManager = () => {
             Quản Lý Đơn Hàng Chờ Xác Nhận
           </Title>
           <Table
+            scroll={{ x: "max-content" }}
             columns={columns}
             dataSource={orders}
             rowKey="idDonHang"

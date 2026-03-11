@@ -86,7 +86,8 @@ const OrderDetail = ({ visible, onCancel, orderId }) => {
       <Title level={4} style={{ marginTop: 16 }}>
         Chi tiết đơn hàng
       </Title>
-      <Table columns={columns} dataSource={orderDetails} rowKey="idSanPham" />
+      <Table
+            scroll={{ x: "max-content" }} columns={columns} dataSource={orderDetails} rowKey="idSanPham" />
     </Modal>
   );
 };

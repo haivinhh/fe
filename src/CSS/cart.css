@@ -1,13 +1,13 @@
+/* cart.css */
 .cart-container {
-  width: 80%;
+  width: 90%;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
-
-
 .table img {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: 5px;
 }
@@ -16,17 +16,21 @@
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .recipient-info {
-  flex: 1; /* Allow this section to take up as much space as needed */
-  margin-right: 20px; /* Space between the recipient info and total section */
+  flex: 1;
+  min-width: 260px;
+  margin-right: 20px;
   text-align: left;
 }
 
 .cart-total {
   text-align: right;
-  margin-top: 20px; /* Space between recipient info and total section */
+  margin-top: 0;
+  min-width: 200px;
 }
 
 .payment-method {
@@ -44,6 +48,7 @@
 
 .cart-table-container {
   margin-top: 20px;
+  overflow-x: auto;
 }
 
 .ant-table-tbody > tr > td {
@@ -56,19 +61,60 @@
 }
 
 .recipient-info div {
-  margin-bottom: 10px; /* Space between input fields */
+  margin-bottom: 10px;
   display: flex;
-  flex-direction: column; /* Align items vertically */
+  flex-direction: column;
 }
 
 input.ant-input {
-  width: 100%; /* Full width of the parent container */
-  max-width: 350px; /* Optional: Set a max-width to control input field size */
+  width: 100%;
+  max-width: 350px;
 }
 
 .ant-radio-group {
   display: flex;
-  flex-direction: row; /* Align radio buttons horizontally */
-  gap: 10px; /* Optional: Add some space between radio buttons */
-  margin-left: 300px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-left: 0;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .cart-container {
+    width: 95%;
+  }
+
+  .cart-summary {
+    flex-direction: column;
+  }
+
+  .cart-total {
+    text-align: left;
+  }
+
+  .payment-method {
+    text-align: left;
+  }
+
+  .recipient-info {
+    margin-right: 0;
+  }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .cart-container {
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  .table img {
+    width: 55px;
+    height: 55px;
+  }
+
+  input.ant-input {
+    max-width: 100%;
+  }
 }

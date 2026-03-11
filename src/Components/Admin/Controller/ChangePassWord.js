@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createAxiosAdmin } from "../../../redux/createInstance";
 import { loginAdminSuccess } from "../../../redux/authSliceAdmin";
 
-const ChangePassword = ({ visible, onCancel, idUser }) => {
+const ChangePassword = ({ visible, onCancel, userId }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authAdmin.loginAdmin?.currentUser);
@@ -14,8 +14,11 @@ const ChangePassword = ({ visible, onCancel, idUser }) => {
     form.validateFields()
       .then(async (values) => {
         try {
-            console.log("Sending values to server:", { ...values, idUser });
-          await axiosAdmin.put("/api/customer/changepassword", { ...values, idUser });
+            console.log("Sending values to server:", { ...values, userId });
+          await axiosAdmin.post(`/api/users/changePassword/${userId}`, {
+            currentPassword: values.currentPassword,
+            newPassword: values.newPassword,
+          });
           notification.success({
             message: "Success",
             description: "Thay đổi mật khẩu thành công",
@@ -46,8 +49,15 @@ const ChangePassword = ({ visible, onCancel, idUser }) => {
       <Form
         form={form}
         layout="vertical"
-        initialValues={{ password: "", confirmPassword: "" }}
+        initialValues={{ currentPassword: "", newPassword: "", confirmPassword: "" }}
       >
+        <Form.Item
+          name="currentPassword"
+          label="Mật khẩu hiện tại"
+          rules={[{ required: true, message: "Mật khẩu hiện tại là bắt buộc" }]}
+        >
+          <Input.Password style={{ width:"350px" }}/>
+        </Form.Item>
         <Form.Item
           name="newPassword"
           label="Mật khẩu mới"

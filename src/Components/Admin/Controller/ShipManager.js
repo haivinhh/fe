@@ -178,7 +178,8 @@ const ShipManager = () => {
       >
         Thêm đơn vị vận chuyển
       </Button>
-      <Table columns={columns} dataSource={dvvc} rowKey="idDonViVanChuyen" />
+      <Table
+            scroll={{ x: "max-content" }} columns={columns} dataSource={dvvc} rowKey="idDonViVanChuyen" />
       <Modal
         title={
           <div style={{ textAlign: "center" }}>

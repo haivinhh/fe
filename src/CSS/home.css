@@ -1,42 +1,56 @@
-src/CSS/home.css
-
-.carousel-container {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-}
-
+/* home.css */
 .carousel-item img {
-    width: 100%;
-    height: auto;
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: cover;
 }
 
 .card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .card-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center; /* Center align all items in the card body */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .product-image {
-    width: 200px;
-    height: 400px;
-    object-fit: cover;
-    border-bottom: 1px solid #ddd;
-    margin: 0 auto; /* Center the image horizontally */
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-bottom: 1px solid #ddd;
+  margin: 0 auto;
+  display: block;
 }
 
 .card-text {
-    margin-top: auto;
-    text-align: center; /* Optional: Center align text if desired */
+  margin-top: auto;
+  text-align: center;
 }
+
 .no-underline {
-    text-decoration: none;
-  }
-  
+  text-decoration: none;
+}
+
+/* Tablet */
+@media (max-width: 991px) {
+  .product-image { height: 210px; }
+  .carousel-item img { max-height: 320px; }
+}
+
+/* Mobile landscape */
+@media (max-width: 768px) {
+  .product-image { height: 180px; }
+  .carousel-item img { max-height: 240px; }
+}
+
+/* Mobile portrait */
+@media (max-width: 576px) {
+  .product-image { height: 200px; }
+  .carousel-item img { max-height: 180px; }
+}

@@ -1,5 +1,7 @@
+/* profilecus.css */
 .profile-container {
   margin-top: 20px;
+  padding: 0 16px;
 }
 
 .profile-info, .password-change {
@@ -11,8 +13,10 @@
 
 .info-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .info-item label {
@@ -26,27 +30,28 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-width: 0;
 }
 
 .info-text {
   display: flex;
   justify-content: space-between;
   width: 100%;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .edit-icon {
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 .password-change {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  max-width: 500px; /* Adjust width as needed */
-  margin: 0 auto; /* Center-align the section */
-  text-align: center; /* Center-align text */
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .profile-orders {
@@ -68,4 +73,36 @@
 
 .button-edit {
   margin-left: auto;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .info-item label {
+    flex: 0 0 120px;
+    font-size: 14px;
+  }
+
+  .password-change {
+    max-width: 100%;
+  }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .info-item {
+    flex-direction: column;
+  }
+
+  .info-item label {
+    flex: unset;
+    width: 100%;
+  }
+
+  .info-content {
+    width: 100%;
+  }
+
+  .profile-info, .password-change {
+    padding: 14px;
+  }
 }

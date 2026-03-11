@@ -352,6 +352,7 @@ const ProfileManager = () => {
         Đơn Hàng Đã Xác Nhận
       </Title>
       <Table
+            scroll={{ x: "max-content" }}
         columns={columns}
         dataSource={orders}
         rowKey="idDonHang"

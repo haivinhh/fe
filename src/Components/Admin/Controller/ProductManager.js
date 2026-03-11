@@ -251,7 +251,8 @@ const ProductManager = () => {
       >
         Thêm sản phẩm
       </Button>
-      <Table columns={columns} dataSource={products} rowKey="idSanPham" />
+      <Table
+            scroll={{ x: "max-content" }} columns={columns} dataSource={products} rowKey="idSanPham" />
       <Modal
         title={<div style={{ textAlign: 'center' }}>{editingProduct ? "Sửa sản phẩm" : "Thêm sản phẩm"}</div>}
         visible={isModalVisible}

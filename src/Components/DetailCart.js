@@ -79,6 +79,7 @@ const DetailCart = () => {
         ) : (
           <div className="cart-table-container">
             <Table
+            scroll={{ x: "max-content" }}
               columns={columns}
               dataSource={cartData}
               rowKey="idSanPham"

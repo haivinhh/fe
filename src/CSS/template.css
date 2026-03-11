@@ -1,28 +1,21 @@
-html, body {
+/* template.css */
+html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
-#root {
-  height: 100%;
-}
-
 .sider-custom {
-  background: #02101d; /* Default Sider color */
-  height: 200vh; /* Full height for Sider */
-  position: fixed;
-  left: 0;
-  top: 0;
-  overflow: auto; /* Full height of the viewport */
+  background: #02101d !important;
+  min-height: 100vh;
 }
 
 .header-custom {
   display: flex;
   align-items: center;
-  background-color: #01172bde; /* Blue background strip */
-  padding-left: 16px;
-  padding-right: 16px;
+  background-color: #031220 !important;
+  padding: 0 16px;
+  height: 64px;
 }
 
 .logo-container {
@@ -30,48 +23,23 @@ html, body {
   justify-content: center;
   align-items: center;
   padding: 10px;
-}
-
-.logo {
-  max-width: 100%;
-  height: 30px;
-}
-
-.layout-container {
-  display: flex;
-  height: 100vh;
-}
-
-.header-custom {
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  height: 64px; /* Chiều cao của header */
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   height: 64px;
-  padding: 16px;
 }
 
 .logo {
   max-width: 100%;
   height: auto;
+  max-height: 40px;
 }
 
-.ant-dropdown-menu a {
-  text-decoration: none; /* Remove underline */
+.layout-container {
+  display: flex;
+  min-height: 100vh;
 }
 
-.ant-dropdown-menu a:hover {
-  text-decoration: none; /* Ensure underline is removed on hover */
-}
-
-/* Optional: Add custom hover styling for better UX */
+.ant-dropdown-menu a { text-decoration: none; }
+.ant-dropdown-menu a:hover { text-decoration: none; }
 .ant-dropdown-menu-item:hover {
-  background-color: #1890ff; /* Example hover color */
-  color: #fff; /* Example text color */
+  background-color: #1890ff;
+  color: #fff;
 }

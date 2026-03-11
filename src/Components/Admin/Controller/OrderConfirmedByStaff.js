@@ -123,6 +123,7 @@ const OrdersTable = ({ userId, orders, onBack }) => {
         Quay lại
       </Button>
       <Table
+            scroll={{ x: "max-content" }}
         dataSource={orders}
         columns={columns}
         rowKey="idDonHang"

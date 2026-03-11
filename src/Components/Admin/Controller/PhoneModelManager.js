@@ -202,7 +202,8 @@ const PhoneModelManager = () => {
       >
         Thêm Dòng Điện Thoại
       </Button>
-      <Table columns={columns} dataSource={phoneModels} rowKey="idDongDT" pagination={{ pageSize: 20 }}  />
+      <Table
+            scroll={{ x: "max-content" }} columns={columns} dataSource={phoneModels} rowKey="idDongDT" pagination={{ pageSize: 20 }}  />
       <Modal
         title={
           <div style={{ textAlign: "center" }}>

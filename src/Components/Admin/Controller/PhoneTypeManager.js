@@ -163,7 +163,8 @@ const PhoneTypeManager = () => {
       >
         Thêm loại điện thoại
       </Button>
-      <Table columns={columns} dataSource={phoneTypes} rowKey="idLoaiDT" />
+      <Table
+            scroll={{ x: "max-content" }} columns={columns} dataSource={phoneTypes} rowKey="idLoaiDT" />
       <Modal
         title={<div style={{ textAlign: 'center' }}>{editingPhoneType ? "Sửa loại điện thoại" : "Thêm loại điện thoại"}</div>}
         visible={isModalVisible}

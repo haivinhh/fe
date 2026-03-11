@@ -253,6 +253,7 @@ const StaffManager = () => {
             </Button>
           </div>
           <Table
+            scroll={{ x: "max-content" }}
             dataSource={staffs}
             columns={staffColumns}
             rowKey="idNhanVien"
@@ -303,6 +304,15 @@ const StaffManager = () => {
               >
                 <Input />
               </Form.Item>
+              {!editingStaff && (
+                <Form.Item
+                  name="password"
+                  label="Mật khẩu"
+                  rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }, { min: 6, message: 'Mật khẩu tối thiểu 6 ký tự!' }]}
+                >
+                  <Input.Password placeholder="Nhập mật khẩu" />
+                </Form.Item>
+              )}
               <Form.Item
                 name="admin"
                 label="Chức vụ"

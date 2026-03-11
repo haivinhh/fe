@@ -1,5 +1,7 @@
+/* ordermanager.css */
 .order-manager-container {
   padding: 16px;
+  overflow-x: auto;
 }
 
 .order-details-container {
@@ -17,7 +19,7 @@
   padding: 16px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  text-align: left; /* Align text to the left */
+  text-align: left;
 }
 
 .order-details-left {
@@ -26,10 +28,15 @@
 
 .order-details-right {
   background-color: #fff;
+  overflow-x: auto;
+}
+
+.order-details-table {
+  overflow-x: auto;
 }
 
 .order-details-table img {
-  max-width: 100px;
+  max-width: 80px;
   height: auto;
 }
 
@@ -39,4 +46,31 @@
 
 .order-details-left span {
   font-weight: bold;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .order-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .order-manager-container {
+    padding: 8px;
+  }
+
+  .order-details-container {
+    padding: 8px;
+  }
+
+  .order-details-left,
+  .order-details-right {
+    padding: 10px;
+  }
+
+  .order-details-table img {
+    max-width: 55px;
+  }
 }

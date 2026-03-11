@@ -11,3 +11,31 @@
 .ant-table-wrapper .ant-table-tbody > tr > td {
     /* Add custom styles for body cells here if desired */
 }
+
+/* Responsive table wrapper */
+.ant-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ant-table {
+  min-width: 100%;
+}
+
+/* Prevent text overflow in cells */
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  white-space: nowrap;
+}
+
+.ant-table-wrapper .ant-table-thead > tr > th {
+  white-space: nowrap;
+}
+
+/* Mobile: make action buttons stack better */
+@media (max-width: 768px) {
+  .ant-table-wrapper .ant-table-thead > tr > th,
+  .ant-table-wrapper .ant-table-tbody > tr > td {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+}

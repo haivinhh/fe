@@ -207,6 +207,7 @@ const OrderDoneManager = () => {
               </div>
               <div className="order-details-right">
                 <Table
+            scroll={{ x: "max-content" }}
                   columns={[
                     {
                       title: "Sản Phẩm",
@@ -250,6 +251,7 @@ const OrderDoneManager = () => {
             Quản Lý Đơn Hàng Đã Giao
           </Title>
           <Table
+            scroll={{ x: "max-content" }}
             columns={columns}
             dataSource={orders}
             rowKey="idDonHang"

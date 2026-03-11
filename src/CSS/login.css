@@ -1,21 +1,30 @@
+/* login.css */
 .login-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    
+  max-width: 400px;
+  width: 90%;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-muted a {
+  text-decoration: none;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .login-container {
+    margin: 20px auto;
+    padding: 16px;
+    width: 95%;
   }
-  
-  
-  button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .text-muted a {
-    text-decoration: none; /* Loại bỏ gạch chân */
-  }
-  
+}

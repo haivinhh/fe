@@ -1,46 +1,48 @@
-/* Ensures the entire page takes up the full height of the viewport */
-
-
-/* Container for centering the login form */
+/* loginad.css */
 .login-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 400px; /* Restrict the maximum width of the form */
-    padding: 20px;
-    background: #fff; /* White background for the form */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Styling for the logo */
 .logo-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px; /* Space between logo and form */
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .logo {
-    max-width: 100%;
-    height: auto;
-    max-height: 80px; /* Restrict the height of the logo */
+  max-width: 100%;
+  height: auto;
+  max-height: 80px;
 }
 
-/* Style for the login form */
 .login-form {
-    width: 100%; /* Full width form */
+  width: 100%;
 }
 
-/* Style for the form items */
 .login-form .ant-form-item {
-    margin-bottom: 16px; /* Space between form items */
+  margin-bottom: 16px;
 }
 
-/* Style for the submit button */
 .login-form .ant-btn-primary {
-    width: 100%; /* Full width button */
-    /* Match the border color to the button color */
-    font-size: 16px; /* Font size for button */
+  width: 100%;
+  font-size: 16px;
+}
+
+@media (max-width: 576px) {
+  .login-container {
+    padding: 16px;
+    width: 95%;
+  }
+  .login-form .ant-btn-primary {
+    font-size: 14px;
+  }
 }

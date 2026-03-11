@@ -60,7 +60,10 @@ export const logOutCus = async (dispatch, navigate, accessToken, axiosJWT) => {
     navigate("/");
   } catch (err) {
     console.error("Logout failed:", err);
-    dispatch(logOutFailed());
+    // Vẫn clear state dù API lỗi để user không bị kẹt
+    dispatch(logOutSuccess());
+    dispatch(getCartLogout());
+    navigate("/");
   }
 };
 

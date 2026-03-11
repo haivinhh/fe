@@ -8,7 +8,7 @@ import http from "../HTTP/http";
 import '../CSS/header.css';
 import { logOutCus } from "../redux/apiRequest";
 import { createAxios } from "../redux/createInstance";
-import { logOutSuccess } from "../redux/authSlice";
+import { logOutSuccess, loginSuccess } from "../redux/authSlice";
 import { getCartLogout } from "../redux/cartSlice";
 
 const Header = ({ onSearch }) => {
@@ -22,7 +22,7 @@ const Header = ({ onSearch }) => {
   const idUser = customer?.idUser;
   
   // Create axios instance
-  let axiosJWT = createAxios(customer, dispatch, logOutSuccess, getCartLogout);
+  let axiosJWT = createAxios(customer, dispatch, loginSuccess);
 
   const handleLogoutClick = async () => {
     try {

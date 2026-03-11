@@ -349,6 +349,7 @@ const Cart = () => {
         <Title level={2}>Giỏ hàng của bạn</Title>
         <div className="cart-table-container">
           <Table
+            scroll={{ x: "max-content" }}
             columns={columns}
             dataSource={cartData}
             pagination={false}

@@ -180,7 +180,8 @@ const CateManager = () => {
       >
         Thêm danh mục
       </Button>
-      <Table columns={columns} dataSource={categories} rowKey="idDanhMuc" />
+      <Table
+            scroll={{ x: "max-content" }} columns={columns} dataSource={categories} rowKey="idDanhMuc" />
       <Modal
         title={
           <div style={{ textAlign: "center" }}>
