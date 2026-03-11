@@ -24,7 +24,7 @@ const refreshTokenCus = async () => {
   };
 export const createAxios = (currentUser,dispatch,stateSuccess)  => {
     const newInstance = axios.create({
-        baseURL: "http://localhost:3001",
+        baseURL: "https://be-lvtn.onrender.com",
         withCredentials: true
     });
     newInstance.interceptors.request.use(
